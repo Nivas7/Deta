@@ -1,0 +1,43 @@
+{
+  "name": "deta-server",
+  "version": "0.0.0",
+  "description": "Minimalistic Data Log Application Server.",
+  "type": "module",
+  "engines": {
+    "node": ">= 22.11 < 23"
+  },
+  "devDependencies": {
+    "@eslint/js": "~9.17",
+    "@types/eslint__js": "~8.42",
+    "@types/node": "~20",
+    "@typescript-eslint/parser": "~8.19",
+    "eslint": "~9.17",
+    "eslint-config-prettier": "~9.1",
+    "globals": "~15.14",
+    "prettier": "~3.4",
+    "rimraf": "~6.0",
+    "ts-api-utils": "~2.0",
+    "typescript": "~5.7",
+    "typescript-eslint": "~8.19"
+  },
+  "scripts": {
+    "start": "node build/src/main.js",
+    "clean": "rimraf coverage build tmp",
+    "prebuild": "npm run lint",
+    "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -w -p tsconfig.json",
+    "build:release": "npm run clean && tsc -p tsconfig.release.json",
+    "lint": "eslint .",
+    "prettier": "prettier \"{src,__{tests}__}/**/*.{ts,mts}\" --config .prettierrc --write",
+    "prettier:check": "prettier \"{src,__{tests}__}/**/*.{ts,mts}\" --config .prettierrc --check"
+  },
+  "author": "Nivaz",
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "express": "^4.21.2",
+    "tslib": "~2.8"
+  },
+  "volta": {
+    "node": "22.12.0"
+  }
+}
