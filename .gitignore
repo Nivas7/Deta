@@ -1,26 +1,36 @@
-# Node.js
-node_modules/
-
 # Logs
 logs
 *.log
 npm-debug.log*
-
-# Dependency directories
-pids
-logs
-*.pid
-*.seed
-*.pid.lock
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional REPL history
-.node_repl_history
-
+yarn-debug.log*
+yarn-error.log*
+ 
+# Node.js
+node_modules/
+dist/
+build/
+ 
 # Environment variables
-.env*
+.env
+ 
+# Frontend build artifacts
+/frontend/build/
+ 
+# Backend build artifacts
+/backend/dist/
+ 
+# Dependency directories
+/frontend/node_modules/
+/backend/node_modules/
+ 
+# IDE/Editor settings
+.vscode/
+.idea/
+ 
+# OS files
+.DS_Store
+Thumbs.db
+ 
+# Misc
+*.swp
+*.bak
