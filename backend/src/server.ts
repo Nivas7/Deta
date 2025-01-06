@@ -1,35 +1,16 @@
-import express, { Application, Request, Response } from "express";
-import apiRouter from "./routes/api.js";
-import { MONGODB_URI } from "./utils/secrets.js";
-import mongoose from "mongoose";
+import express from "express";
+import dotenv from "dotenv";
+import database from "./configs/database.js";
+import routes from "./routes/route.js";
 
-const app: Application = express();
-const port = process.env.PORT || 3000;
+dotenv.config();
+
+const app = express();
 
 app.use(express.json());
 
-const mongo = async () => {
-  try {
-    await mongoose.connect(MONGODB_URI);
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-app.use("/api/v1", apiRouter);
-app.get("/ping", (_req: Request, res: Response) => {
-  res.send("pong");
+app.listen(process.env.PORT, () => {
+  routes(app);
+  database();
+  console.log(`Deta Application Server listening on port ${process.env.PORT}`);
 });
-
-mongo();
-
-app.listen(port, () => {
-  console.log(`Deta Application Server listening on port ${port}`);
-});
-
-
-
-
-
-export default app;
