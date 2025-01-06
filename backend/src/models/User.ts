@@ -4,12 +4,7 @@ import { Password } from "../services/password.service.js";
 
 export type UserDocument = mongoose.Document & {
   username: string;
-  email: string;
   password: string;
-  movies: mongoose.Schema.Types.ObjectId[];
-  expenses: mongoose.Schema.Types.ObjectId[];
-  jobs: mongoose.Schema.Types.ObjectId[];
-  files: mongoose.Schema.Types.ObjectId[];
 };
 
 interface UserModel extends mongoose.Model<UserDocument> {
@@ -23,19 +18,10 @@ const UserSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     password: {
       type: String,
       required: true,
     },
-    movies: [{ type: mongoose.Schema.Types.ObjectId }],
-    expenses: [{ type: mongoose.Schema.Types.ObjectId }],
-    jobs: [{ type: mongoose.Schema.Types.ObjectId }],
-    files: [{ type: mongoose.Schema.Types.ObjectId }],
   },
   {
     timestamps: true,

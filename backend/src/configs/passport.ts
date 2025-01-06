@@ -2,6 +2,7 @@ import passport from "passport";
 import passportLocal from "passport-local";
 import passportJwt from "passport-jwt";
 import { User } from "../models/User.js";
+import { JWT_SECRET } from "../utils/secrets.js";
 
 const LocalStrategy = passportLocal.Strategy;
 const JwtStrategy = passportJwt.Strategy;
