@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
-import { MONGODB_URI } from "../utils/secrets.js";
 
 async function database(): Promise<void> {
   try {
-    await mongoose.connect(MONGODB_URI);
+    console.log(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log("Database Connected ");
   } catch (error: any) {
-    console.error("Database COnnection Failed");
+    console.error(`Database Connection Failed => ${error}`);
   }
 }
 
