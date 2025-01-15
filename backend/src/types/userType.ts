@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import type { Document } from "mongoose";
 
 export interface ReturnType<T> {
   success: boolean;

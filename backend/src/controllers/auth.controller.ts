@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { createUser, logInUser } from "../services/user.service.js";
 
 async function logInController(req: Request, res: Response): Promise<void> {

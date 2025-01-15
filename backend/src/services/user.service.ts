@@ -1,5 +1,5 @@
 import User from "../models/User.js";
-import {
+import type {
   CreateUserInput,
   LoginUserInput,
   LoginUserResturnType,

@@ -6,5 +6,5 @@
 
 > > [!NOTE]
 
-- Make archetecture clean
+- Make architecture clean
 - Better Types and Error Handling
