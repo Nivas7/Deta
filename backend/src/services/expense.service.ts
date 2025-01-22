@@ -1,5 +1,5 @@
-import { Expense } from "../models/Expense";
-import { ExpenseInput } from "../types/expenseType";
+import { Expense } from "../models/Expense.js";
+import { ExpenseInput } from "../types/expenseType.js";
 
 interface ServiceResponse {
   success: boolean;
