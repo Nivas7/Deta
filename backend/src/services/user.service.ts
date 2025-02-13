@@ -1,18 +1,22 @@
+import { Response } from "express";
 import User from "../models/User.js";
 import type {
   CreateUserInput,
+  DbUser,
   LoginUserInput,
-  LoginUserResturnType,
+  LoginUserReturnType,
   ReturnType,
-  userDocument,
 } from "../types/userType.js";
-import generateJwtTokens from "../utils/generateJwtTokens.js";
 import getHashedPassword from "../utils/getHashedPassword.js";
 import validatePassword from "../utils/validatePassword.js";
+import {
+  clearAuthCookies,
+  sendAuthCookies,
+} from "../utils/createAuthTokens.js";
 
 export async function createUser(
   userData: CreateUserInput,
-): Promise<ReturnType<Omit<userDocument, "password">>> {
+): Promise<ReturnType<Omit<DbUser, "password">>> {
   const existingUser = await User.findOne({ email: userData.email });
 
   if (existingUser !== null) {
@@ -49,7 +53,8 @@ export async function createUser(
 
 export async function logInUser(
   userCredentials: LoginUserInput,
-): Promise<ReturnType<LoginUserResturnType>> {
+  res: Response,
+): Promise<ReturnType<LoginUserReturnType>> {
   const currentUser = await User.findOne({ email: userCredentials.email });
 
   if (!currentUser) {
@@ -75,18 +80,73 @@ export async function logInUser(
     };
   }
 
-  const token = generateJwtTokens(currentUser);
+  // Set auth cookies instead of returning token
+  sendAuthCookies(res, currentUser);
 
   const user = {
     userId: currentUser.id,
     username: currentUser.username,
     userEmail: currentUser.email,
-    token,
   };
+
   return {
     success: true,
     status: 200,
     message: "Login Successful",
     data: user,
   };
+}
+
+export async function logoutUser(
+  res: Response,
+): Promise<ReturnType<{ message: string }>> {
+  try {
+    clearAuthCookies(res);
+    return {
+      success: true,
+      status: 200,
+      message: "Logged out successfully",
+      data: { message: "User logged out" },
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      status: 500,
+      message: "Logout failed",
+      data: { message: error.message },
+    };
+  }
+}
+
+export async function refreshTokenVersion(
+  userId: string,
+): Promise<ReturnType<DbUser>> {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return {
+        success: false,
+        status: 404,
+        message: "User not found",
+        data: null,
+      };
+    }
+
+    user.refreshTokenVersion = (user.refreshTokenVersion || 0) + 1;
+    await user.save();
+
+    return {
+      success: true,
+      status: 200,
+      message: "Token version updated",
+      data: user,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      status: 500,
+      message: "Failed to update token version",
+      data: null,
+    };
+  }
 }

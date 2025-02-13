@@ -19,7 +19,7 @@ function routes(app: Express): void {
 
   app.post("/login", logInController);
 
-  app.post("/expenses", authMiddleware, (req: Request, res: Response) => {
+  app.post("/expenses", (req: Request, res: Response) => {
     const user = req.user;
     res.status(200).send(`Expenses for ${user?.name}`);
   });

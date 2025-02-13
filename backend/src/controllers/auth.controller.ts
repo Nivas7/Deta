@@ -3,7 +3,7 @@ import { createUser, logInUser } from "../services/user.service.js";
 
 async function logInController(req: Request, res: Response): Promise<void> {
   const userCredentials = req.body;
-  const response = await logInUser(userCredentials);
+  const response = await logInUser(userCredentials, res);
 
   if (response.success === true) {
     res.status(response.status).json(response);

@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import type { userDocument } from "../types/userType.js";
+import type { DbUser } from "../types/userType.js";
 
 const userSchema = new Schema(
   {
@@ -16,11 +16,16 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    refreshTokenVersion: {
+      type: Number,
+      required: true,
+      default: 1,
+    },
   },
   {
     timestamps: true,
   },
 );
 
-const User = model<userDocument>("User", userSchema);
+const User = model<DbUser>("User", userSchema);
 export default User;

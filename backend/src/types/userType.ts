@@ -18,15 +18,17 @@ export interface LoginUserInput {
   password: string;
 }
 
-export interface LoginUserResturnType {
+export interface LoginUserReturnType {
   userId: string;
   username: string;
   userEmail: string;
-  token: string;
 }
 
-export interface userDocument extends CreateUserInput, Document {
-  id: string;
+export interface DbUser extends Document {
+  username: string;
+  email: string;
+  password: string;
+  refreshTokenVersion: number;
   createdAt: Date;
   updatedAt: Date;
 }
