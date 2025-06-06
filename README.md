@@ -1,5 +1,10 @@
 # Deta
 
+**Switch the Backend Server to Go and needs to finish the Projects**
+
+-------------------------------
+
+
 A Personal data logging application built with React Native. Deta combines the Japanese word for data with clean, minimalist approach to personal information management.
 
 ## Vision
