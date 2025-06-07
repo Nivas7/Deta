@@ -2,7 +2,7 @@
 
 The JavaScript version of this project exists on the `main` branch.
 
-> **⚠️ Development has moved to the [`rewrite/go`](https://github.com/your-username/your-repo/tree/rewrite/go) branch.**
+> **⚠️ Development has moved to the [`rewrite/go`](https://github.com/nivas7/Deta/tree/rewrite/go) branch.**
 
 ## 🔁 Golang Rewrite
 
