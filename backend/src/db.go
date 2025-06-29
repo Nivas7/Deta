@@ -38,4 +38,3 @@ func getUsers() ([]User, error) {
 	err := DB.Find(&users).Error
 	return users, err
 }
-
