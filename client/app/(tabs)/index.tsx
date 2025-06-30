@@ -1,184 +1,135 @@
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { navigate } from 'expo-router/build/global-state/routing';
-import { useState } from 'react';
-import { Alert, Button, StyleSheet, TextInput, View } from 'react-native';
-import Svg, { Circle, Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
-import { useApplications } from '../../hooks/ApplicationProvider';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, RefreshControl } from 'react-native';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
-function AppLogoSVG() {
-  return (
-    <View style={styles.svgContainer}>
-      <Svg width={90} height={90} viewBox="0 0 90 90">
-        <Defs>
-          <LinearGradient id="appGradient" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0%" stopColor="#A1CEDC" />
-            <Stop offset="100%" stopColor="#1D3D47" />
-          </LinearGradient>
-        </Defs>
-        <Rect x={10} y={10} width={70} height={70} rx={18} fill="url(#appGradient)" />
-        <Path
-          d="M30 50 L45 30 L60 50"
-          stroke="#fff"
-          strokeWidth={4}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Circle cx={45} cy={60} r={5} fill="#fff" />
-      </Svg>
-    </View>
-  );
-}
-
-export type Application = {
-  company: string;
-  role: string;
-  status: string;
-  notes: string;
-  date: string;
-};
+import { useJobs } from '@/hooks/useJobs';
+import { globalStyles } from '@/styles/global';
+import { Button } from '@/components/common/Button';
+import { JobCard } from '@/components/card/cards';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  const { addApplication } = useApplications();
+  const { applications, loading, updateApplicationStatus, deleteApplication, refresh } = useJobs();
+  const [refreshing, setRefreshing] = useState(false);
 
-  const [company, setCompany] = useState('');
-  const [role, setRole] = useState('');
-  const [status, setStatus] = useState('');
-  const [notes, setNotes] = useState('');
-
-  const handleSubmit = () => {
-    if (!company || !role) {
-      Alert.alert('Missing Fields', 'Please enter both company and role.');
-      return;
-    }
-    addApplication({
-      company,
-      role,
-      status,
-      notes,
-      date: new Date().toISOString(),
-    });
-    Alert.alert('Application Saved', `Company: ${company}\nRole: ${role}`);
-    setCompany('');
-    setRole('');
-    setStatus('');
-    setNotes('');
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refresh();
+    setRefreshing(false);
   };
 
+  const handleDeleteJob = (id: string) => {
+    deleteApplication(id);
+  };
+
+  const recentApplications = applications.slice(0, 5);
+  const hasApplications = applications.length > 0;
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={<AppLogoSVG />}
+    <ScrollView
+      style={globalStyles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={styles.headingText}>
-          Job Application Tracker
-        </ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Company"
-          value={company}
-          onChangeText={setCompany}
-          placeholderTextColor="#7BA7B9"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Role"
-          value={role}
-          onChangeText={setRole}
-          placeholderTextColor="#7BA7B9"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Status (e.g. Applied, Interview)"
-          value={status}
-          onChangeText={setStatus}
-          placeholderTextColor="#7BA7B9"
-        />
-        <TextInput
-          style={[styles.input, styles.notesInput]}
-          placeholder="Notes"
-          value={notes}
-          onChangeText={setNotes}
-          placeholderTextColor="#7BA7B9"
-          multiline
-        />
-        <View style={styles.buttonWrapper}>
-          <Button title="Save Application" onPress={handleSubmit} color="#1D3D47" />
-        </View>
-        <View style={styles.historyButtonWrapper}>
+      <View style={globalStyles.content}>
+        {/* Welcome Section */}
+        <View style={globalStyles.card}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <Ionicons name="briefcase-outline" size={24} color="#3B82F6" />
+            <Text style={[globalStyles.header, { marginLeft: 12, marginBottom: 0, fontSize: 24 }]}>
+              Welcome Back!
+            </Text>
+          </View>
+          <Text style={globalStyles.subHeader}>
+            {hasApplications
+              ? `You have ${applications.length} job applications tracked`
+              : 'Start tracking your job applications today'
+            }
+          </Text>
+
           <Button
-            title="Go to History"
-            color="#A1CEDC"
-            onPress={() => navigate('/explore')}
+            title="Add New Application"
+            onPress={() => router.push('/modal/add-job')}
+            style={{ marginTop: 12 }}
+            disabled={false}
           />
         </View>
-      </ThemedView>
-    </ParallaxScrollView>
+
+        {/* Quick Stats */}
+        {hasApplications && (
+          <View style={globalStyles.card}>
+            <Text style={[globalStyles.header, { fontSize: 20, marginBottom: 16 }]}>
+              Quick Overview
+            </Text>
+            <View style={globalStyles.statsContainer}>
+              <View style={globalStyles.statCard}>
+                <Text style={globalStyles.statNumber}>{applications.length}</Text>
+                <Text style={globalStyles.statLabel}>Total Applications</Text>
+              </View>
+              <View style={globalStyles.statCard}>
+                <Text style={globalStyles.statNumber}>
+                  {applications.filter(app => app.status === 'Applied').length}
+                </Text>
+                <Text style={globalStyles.statLabel}>Pending</Text>
+              </View>
+              <View style={globalStyles.statCard}>
+                <Text style={globalStyles.statNumber}>
+                  {applications.filter(app => app.status === 'Interviewed').length}
+                </Text>
+                <Text style={globalStyles.statLabel}>Interviewed</Text>
+              </View>
+              <View style={globalStyles.statCard}>
+                <Text style={globalStyles.statNumber}>
+                  {applications.filter(app => app.status === 'Accepted').length}
+                </Text>
+                <Text style={globalStyles.statLabel}>Accepted</Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* Recent Applications */}
+        {hasApplications ? (
+          <View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <Text style={[globalStyles.header, { fontSize: 20, marginBottom: 0 }]}>
+                Recent Applications
+              </Text>
+              <Button
+                title="View All"
+                onPress={() => router.push('/history')}
+                variant="secondary"
+                style={{ paddingHorizontal: 16, paddingVertical: 8 }}
+                disabled={false}
+              />
+            </View>
+
+            {recentApplications.map(job => (
+              <JobCard
+                key={job.id}
+                job={job}
+                onStatusUpdate={updateApplicationStatus}
+                onDelete={handleDeleteJob}
+              />
+            ))}
+          </View>
+        ) : (
+          <View style={globalStyles.emptyState}>
+            <Ionicons name="document-text-outline" size={64} color="#9CA3AF" />
+            <Text style={globalStyles.emptyStateText}>No Applications Yet</Text>
+            <Text style={globalStyles.emptyStateSubtext}>
+              Start by adding your first job application to track your progress and visualize your journey.
+            </Text>
+            <Button
+              title="Add Your First Application"
+              onPress={() => router.push('/modal/add-job')}
+              disabled={false}
+            />
+          </View>
+        )}
+      </View>
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  svgContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 24,
-    marginBottom: 8,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
-    justifyContent: 'center',
-  },
-  headingText: {
-    fontWeight: 'bold',
-    fontSize: 24,
-    color: '#1D3D47',
-    letterSpacing: 1,
-  },
-  formContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    padding: 24,
-    margin: 16,
-    shadowColor: '#1D3D47',
-    shadowOpacity: 0.09,
-    shadowRadius: 12,
-    elevation: 3,
-    gap: 14,
-  },
-  input: {
-    backgroundColor: '#F5F7FA',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#1D3D47',
-    borderWidth: 1,
-    borderColor: '#E3E8EF',
-    marginBottom: 4,
-  },
-  notesInput: {
-    minHeight: 60,
-    textAlignVertical: 'top',
-  },
-  buttonWrapper: {
-    marginTop: 10,
-    borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: '#1D3D47',
-  },
-  historyButtonWrapper: {
-    marginTop: 10,
-    borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: '#A1CEDC',
-  },
-});
