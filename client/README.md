@@ -1,53 +1,23 @@
-# Welcome to your Expo app 👋
+> [!NOTE]
+> Still in Beta Version
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# Welcome Deta 👋
 
-## Get started
+**Deta, a React Native application designed for comprehensive job application tracking and analytics.**
 
-1. Install dependencies
+## Preview
 
-   ```bash
-   npm install
-   ```
+<div align="center">
+  <img src="assets/images/Preview/Deta_Home.jpg" alt="Deta Home" width="300"/>
+  <img src="assets/images/Preview/Deta_history.jpg" alt="Deta History" width="300"/>
+  <img src="assets/images/Preview/Deta_Analytics.jpg" alt="Deta Analytics" width="300"/>
+</div>
 
-2. Start the app
+## Beta Access & Feedback
 
-   ```bash
-   npx expo start
-   ```
+If you are interested in using the beta version or want to provide feedback, please [email us](mailto:sri112168@gmail.com?subject=Deta%20Beta%20Access%20Request) with your request or suggestions.
 
-In the output, you'll find options to open the app in a
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
 
 # New folder structure for MVVM and Clean Architecture
 
@@ -66,35 +36,3 @@ Join our community of developers creating universal apps.
   - App.tsx
   - index.tsx
 
-## Changes to be made
-
-1. Create a new folder structure as described above.
-2. Move existing files to their respective folders based on functionality.
-3. Refactor existing code to follow MVVM and Clean Architecture principles.
-4. Improve UI components for better user experience.
-5. Optimize performance and maintainability of the codebase.
-
-### Example of a new component structure:
-
-- components/
-  - InputField.tsx
-  - Button.tsx
-  - Loader.tsx
-
-### Example of a new service structure:
-
-- services/
-  - jobService.ts
-
-### Example of a new utility structure:
-
-- utils/
-  - validation.ts
-
-### Example of a new style structure:
-
-- styles/
-  - colors.ts
-  - typography.ts
-
-This is a high-level overview of the changes to be made.
