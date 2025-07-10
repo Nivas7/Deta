@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, RefreshControl } from 'react-native';
-import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 
+import { JobCard } from '@/components/card/cards';
+import { Button } from '@/components/common/Button';
 import { useJobs } from '@/hooks/useJobs';
 import { globalStyles } from '@/styles/global';
-import { Button } from '@/components/common/Button';
-import { JobCard } from '@/components/card/cards';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const { applications, loading, updateApplicationStatus, deleteApplication, refresh } = useJobs();

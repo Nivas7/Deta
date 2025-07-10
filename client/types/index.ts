@@ -15,6 +15,9 @@ export type JobStatus =
     | 'Rejected'
     | 'Interviewed'
     | 'Accepted'
+    | 'Offered'
+    | 'No Answer'
+    | 'No Offer'
     | 'Declined';
 
 export interface SankeyNode {

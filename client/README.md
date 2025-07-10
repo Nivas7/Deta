@@ -48,3 +48,53 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+# New folder structure for MVVM and Clean Architecture
+
+- client/
+  - app/
+    - components/
+    - domain/
+    - hooks/
+    - modal/
+      - viewmodels/
+      - AddJobModal.tsx
+    - services/
+    - utils/
+    - styles/
+  - assets/
+  - App.tsx
+  - index.tsx
+
+## Changes to be made
+
+1. Create a new folder structure as described above.
+2. Move existing files to their respective folders based on functionality.
+3. Refactor existing code to follow MVVM and Clean Architecture principles.
+4. Improve UI components for better user experience.
+5. Optimize performance and maintainability of the codebase.
+
+### Example of a new component structure:
+
+- components/
+  - InputField.tsx
+  - Button.tsx
+  - Loader.tsx
+
+### Example of a new service structure:
+
+- services/
+  - jobService.ts
+
+### Example of a new utility structure:
+
+- utils/
+  - validation.ts
+
+### Example of a new style structure:
+
+- styles/
+  - colors.ts
+  - typography.ts
+
+This is a high-level overview of the changes to be made.

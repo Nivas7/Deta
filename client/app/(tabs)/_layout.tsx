@@ -40,7 +40,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          headerTitle: 'Job Tracker',
+          headerTitle: 'Deta',
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="home" size={size} color={color} />
           ),
@@ -57,7 +57,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="analytics"
+        name="AnalyticsScreen"
         options={{
           title: 'Analytics',
           headerTitle: 'Analytics Dashboard',

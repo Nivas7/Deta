@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
-import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
+import { JobCard } from '@/components/card/cards';
+import { Button } from '@/components/common/Button';
+import { STATUS_OPTIONS } from '@/constants';
 import { useJobs } from '@/hooks/useJobs';
 import { globalStyles } from '@/styles/global';
-import { Button } from '@/components/common/Button';
-import { JobCard } from '@/components/card/cards';
 import { JobStatus } from '@/types';
-import { STATUS_OPTIONS } from '@/constants';
 
 export default function HistoryScreen() {
   const { applications, loading, updateApplicationStatus, deleteApplication, refresh } = useJobs();
