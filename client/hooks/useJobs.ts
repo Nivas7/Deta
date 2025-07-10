@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
 import { JobApplication, JobStatus } from '@/types';
 import { loadApplications, saveApplications } from '@/utils/storage';
+import { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 
 export const useJobs = () => {
     const [applications, setApplications] = useState<JobApplication[]>([]);
@@ -77,7 +77,10 @@ export const useJobs = () => {
             Rejected: 0,
             Interviewed: 0,
             Accepted: 0,
-            Declined: 0
+            Declined: 0,
+            Offered: 0,
+            'No Answer': 0,
+            'No Offer': 0
         };
 
         applications.forEach(app => {

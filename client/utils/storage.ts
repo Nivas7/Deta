@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { JobApplication } from '@/types';
-import { STORAGE_KEY } from '@/constants';
+import { STORAGE_KEY } from '@/utils/constant';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const loadApplications = async (): Promise<JobApplication[]> => {
     try {

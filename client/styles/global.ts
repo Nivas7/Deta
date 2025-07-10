@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -92,4 +92,12 @@ export const globalStyles = StyleSheet.create({
         color: '#64748B',
         textAlign: 'center',
     },
+    input: {
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 8,
+        padding: 12,
+        marginBottom: 0, // Reset if set previously for multiline
+        height: 50, // Standard height for single-line input
+    }
 });

@@ -1,7 +1,8 @@
+// src/presentation/components/card/cards.tsx
+import { JobApplication, JobStatus } from '@/types';
+import { STATUS_COLORS, STATUS_OPTIONS } from '@/utils/constant';
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { JobApplication, JobStatus } from '../../types';
-import { STATUS_COLORS, STATUS_OPTIONS } from '../../constants';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Button } from '../common/Button';
 
 interface JobCardProps {
@@ -31,7 +32,8 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onStatusUpdate, onDelete 
 
             <View style={styles.actions}>
                 <View style={styles.statusActions}>
-                    {STATUS_OPTIONS.filter(status => status !== job.status).slice(0, 2).map(status => (
+                    {/* Removed .slice(0, 2) to show all relevant options */}
+                    {STATUS_OPTIONS.filter(status => status !== job.status).map(status => (
                         <TouchableOpacity
                             key={status}
                             style={[styles.statusButton, { backgroundColor: STATUS_COLORS[status] }]}
@@ -112,7 +114,10 @@ const styles = StyleSheet.create({
     },
     statusActions: {
         flexDirection: 'row',
+        flexWrap: 'wrap', // Added to wrap buttons
         gap: 8,
+        flex: 1, // Allows status actions to take available space
+        marginRight: 8, // Add some margin between status buttons and delete
     },
     statusButton: {
         paddingHorizontal: 12,

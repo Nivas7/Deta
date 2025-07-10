@@ -1,7 +1,6 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Tabs } from 'expo-router';
+import React from 'react';
 
 export default function TabLayout() {
   return (
@@ -46,21 +45,23 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="history"
         options={{
           title: 'History',
-          headerTitle: 'Application History',
+          headerTitle: 'History',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="list" size={size} color={color} />
           ),
         }}
       />
+
       <Tabs.Screen
-        name="AnalyticsScreen"
+        name="Analytics"
         options={{
           title: 'Analytics',
-          headerTitle: 'Analytics Dashboard',
+          headerTitle: 'Dashboard',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="analytics" size={size} color={color} />
           ),

@@ -1,11 +1,12 @@
+import { store } from '@/app/store';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Platform, SafeAreaView, View, StatusBar as RNStatusBar } from 'react-native';
+import { Platform, StatusBar as RNStatusBar, View } from 'react-native';
+import { Provider } from 'react-redux';
 
 export default function RootLayout() {
   return (
-    <>
-      {/* 1️⃣ Add a background behind the status bar for Android edge-to-edge */}
+    <Provider store={store}>
       {Platform.OS === 'android' && (
         <View
           style={{
@@ -15,14 +16,12 @@ export default function RootLayout() {
         />
       )}
 
-      {/* 2️⃣ Use expo-status-bar, style only */}
       <StatusBar style="dark" translucent backgroundColor="transparent" />
 
-      {/* 3️⃣ Stack Navigator */}
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
-          name="modal/add-job"
+          name="AddJobScreen"
           options={{
             presentation: 'modal',
             title: 'Add Job Application',
@@ -37,6 +36,6 @@ export default function RootLayout() {
           }}
         />
       </Stack>
-    </>
+    </Provider>
   );
 }
