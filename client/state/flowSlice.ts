@@ -1,87 +1,82 @@
 // src/state/flowSlice.ts
-import { JobApplication } from '@/types';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { JobApplication, SankeyLink, SankeyNode } from '@/types'; // Import SankeyLink, SankeyNode
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface FlowsState {
-    flowsInput: string;
+    nodes: SankeyNode[]; // Changed from flowsInput: string
+    links: SankeyLink[]; // Changed from flowsInput: string
     loadingFlows: boolean;
     errorFlows: string | null;
 }
 
 const initialState: FlowsState = {
-    flowsInput: '',
+    nodes: [], // Initialize as empty array
+    links: [], // Initialize as empty array
     loadingFlows: false,
     errorFlows: null,
 };
+
+// Removed getFlowKey as it's no longer directly needed for the new Sankey data structure
 
 export const generateAndSetSankeyFlows = createAsyncThunk(
     'flows/generateAndSetSankeyFlows',
     async (applications: JobApplication[], { rejectWithValue }) => {
         try {
-            const flows: { [key: string]: number } = {};
+            const linkCounts: Record<string, number> = {}; // Stores "source->target": count
+            const uniqueStatuses = new Set<string>();
 
             applications.forEach((app: JobApplication) => {
-                const currentStatus = app.status;
+                // Ensure statusHistory exists and has at least one entry
+                if (app.statusHistory && app.statusHistory.length > 0) {
+                    app.statusHistory.forEach((entry, index) => {
+                        uniqueStatuses.add(entry.status); // Add current status to unique list
 
-                // All applications are implicitly considered part of the initial 'Applications' pool.
-                // We define flows based on where they transition *from* this pool.
+                        if (index < app.statusHistory.length - 1) {
+                            const sourceStatus = entry.status;
+                            const targetStatus = app.statusHistory[index + 1].status;
 
-                // If the application is still 'Applied', it doesn't create a *flow* yet,
-                // it's just part of the 'Applications' conceptual source node.
-                // We only generate flows for applications that have moved BEYOND 'Applied'
-                // or represent a terminal state from the initial application phase.
-
-                if (currentStatus === 'Interviewed') {
-                    // From the general pool of applications to interviews
-                    const flowKey = `Applications -> Interviews`;
-                    flows[flowKey] = (flows[flowKey] || 0) + 1;
-                } else if (currentStatus === 'Offered') {
-                    // Offers always come from Interviews (implicitly handled for now)
-                    const flowKey = `Interviews -> Offers`;
-                    flows[flowKey] = (flows[flowKey] || 0) + 1;
-                } else if (currentStatus === 'Accepted') {
-                    // Accepted always comes from Offers
-                    const flowKey = `Offers -> Accepted`;
-                    flows[flowKey] = (flows[flowKey] || 0) + 1;
-                } else if (currentStatus === 'Rejected') {
-                    // Rejected can happen directly from the initial application stage
-                    const flowKey = `Applications -> Rejected`;
-                    flows[flowKey] = (flows[flowKey] || 0) + 1;
-                } else if (currentStatus === 'No Answer') {
-                    // No answer can also happen directly from the initial application stage
-                    const flowKey = `Applications -> No Answer`;
-                    flows[flowKey] = (flows[flowKey] || 0) + 1;
-                } else if (currentStatus === 'Offer Declined') {
-                    // Candidate declined the offer
-                    const flowKey = `Offers -> Declined`;
-                    flows[flowKey] = (flows[flowKey] || 0) + 1;
-                } else if (currentStatus === 'No Offer') {
-                    // After interview, no offer given
-                    const flowKey = `Interviews -> No Offer`;
-                    flows[flowKey] = (flows[flowKey] || 0) + 1;
+                            // Increment count for this transition
+                            const key = `${sourceStatus}->${targetStatus}`;
+                            linkCounts[key] = (linkCounts[key] || 0) + 1;
+                        }
+                    });
+                } else {
+                    // Fallback for applications without status history (e.g., old data or incomplete)
+                    // If an app only has a single status, it's considered 'Applied' for the diagram
+                    // This creates a "start" node for applications with no history.
+                    // You might adjust this logic based on your desired diagram representation.
+                    if (app.status) {
+                        uniqueStatuses.add('Applied'); // Assume all applications start here
+                        uniqueStatuses.add(app.status);
+                        if (app.status !== 'Applied') {
+                            const key = `Applied->${app.status}`;
+                            linkCounts[key] = (linkCounts[key] || 0) + 1;
+                        }
+                    }
                 }
-                // You might need to add logic for other statuses like 'Withdrawn', 'Ghosted', 'Declined' (general)
-                // based on how they fit into your funnel from the 'Applications' node.
-                // For example:
-                // else if (currentStatus === 'Withdrawn') {
-                //     const flowKey = `Applications -> Withdrawn`;
-                //     flows[flowKey] = (flows[flowKey] || 0) + 1;
-                // }
             });
 
-            const formattedFlows = Object.entries(flows)
-                .map(([flowKey, value]) => `${flowKey}:${value}`)
-                .join('\n');
+            // Create Nodes
+            const nodes: SankeyNode[] = Array.from(uniqueStatuses).map(status => ({
+                id: status,
+                name: status, // Display name is the status itself
+            }));
 
-            return formattedFlows;
+            // Create Links
+            const links: SankeyLink[] = Object.entries(linkCounts).map(([key, value]) => {
+                const [source, target] = key.split('->');
+                return { source, target, value };
+            });
+
+            return { nodes, links }; // Return the structured object
         } catch (error: any) {
-            return rejectWithValue(error.message);
+            console.error('Error generating Sankey flows:', error);
+            return rejectWithValue(error.message || 'Failed to generate flows');
         }
     }
 );
 
-
-export const flowsSlice = createSlice({
+const flowsSlice = createSlice({
     name: 'flows',
     initialState,
     reducers: {},
@@ -91,14 +86,16 @@ export const flowsSlice = createSlice({
                 state.loadingFlows = true;
                 state.errorFlows = null;
             })
-            .addCase(generateAndSetSankeyFlows.fulfilled, (state, action) => {
+            .addCase(generateAndSetSankeyFlows.fulfilled, (state, action: PayloadAction<{ nodes: SankeyNode[]; links: SankeyLink[] }>) => {
                 state.loadingFlows = false;
-                state.flowsInput = action.payload;
+                state.nodes = action.payload.nodes; // Assign nodes
+                state.links = action.payload.links; // Assign links
             })
             .addCase(generateAndSetSankeyFlows.rejected, (state, action) => {
                 state.loadingFlows = false;
                 state.errorFlows = action.payload as string;
-                state.flowsInput = '';
+                state.nodes = []; // Clear nodes on error
+                state.links = []; // Clear links on error
             });
     },
 });

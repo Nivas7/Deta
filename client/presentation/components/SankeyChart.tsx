@@ -1,201 +1,223 @@
 // src/presentation/components/SankeyChart.tsx
-import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+
+import React, { useMemo, useRef } from 'react';
+import { StyleSheet } from 'react-native'; // Import StyleSheet for better styling
 import { WebView } from 'react-native-webview';
 
-// Get screen dimensions to ensure WebView takes full available space
-const { width, height } = Dimensions.get('window');
+// Import your types
+import { SankeyLink, SankeyNode } from '@/types';
 
 interface SankeyChartWebViewProps {
-  flows: string; // Example: "A -> B:5\nB -> C:3"
+  nodes: SankeyNode[];
+  links: SankeyLink[];
 }
 
-export const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({ flows }) => {
-  // Escape backticks within the flows string for JavaScript template literal
-  const escapedFlows = flows.replace(/`/g, '\\`');
+// src/presentation/components/SankeyChart.tsx
 
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Sankey Diagram</title>
-      <script src="https://d3js.org/d3.v7.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
-      <style>
-        body { font-family: sans-serif; margin: 0; overflow: hidden; height: 100vh; width: 100vw; }
-        svg { width: 100%; height: 100%; display: block; }
-      </style>
-    </head>
-    <body>
-      <svg id="sankey"></svg>
-      <script type="text/javascript">
-        const input = \`${escapedFlows}\`;
+// ... (previous imports and component setup)
 
-        function parseFlows(input) {
-          const lines = input.trim().split('\\n');
-          let nodesSet = new Set();
-          const links = [];
+const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
+  nodes,
+  links,
+}) => {
+  const webViewRef = useRef<WebView>(null);
 
-          lines.forEach(line => {
-            // Regex expects "Source -> Target:Value" (no space after colon)
-            const match = line.match(/^(.+?)\\s*->\\s*(.+?):(\\d+)$/);
-            if (match) {
-              const [, source, target, value] = match;
-              nodesSet.add(source.trim());
-              nodesSet.add(target.trim());
-              links.push({
-                source: source.trim(),
-                target: target.trim(),
-                value: +value
-              });
-            } else if (line.trim() !== '') { // Only warn for non-empty malformed lines
-              console.warn("Sankey: Skipping malformed line (does not match 'Source -> Target:Value'):", line);
-            }
-          });
+  const htmlContent = useMemo(() => {
+    const initialNodesJson = JSON.stringify(nodes);
+    const initialLinksJson = JSON.stringify(links);
 
-          const nodes = Array.from(nodesSet).map(name => ({ name }));
-          const nodeIndex = new Map(nodes.map((n, i) => [n.name, i]));
-          links.forEach(l => {
-            if (nodeIndex.has(l.source) && nodeIndex.has(l.target)) {
-                l.source = nodeIndex.get(l.source);
-                l.target = nodeIndex.get(l.target);
-            } else {
-                // This indicates a flow was parsed but its nodes aren't in the generated list.
-                // Could happen if a flow is "A->B:5" but "A" or "B" never appeared as a source/target of another node.
-                console.error("Sankey: Link references non-existent node. Source:", l.source, "Target:", l.target);
-            }
-          });
+    return `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Job Application Sankey Diagram</title>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+        <style>
+          body {
+            margin: 0;
+            overflow: hidden;
+            font-family: sans-serif;
+            background: #f9f9f9;
+          }
+          #sankey-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+          svg {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          }
+          .node rect {
+            stroke: #333;
+          }
+          .node text {
+            font-size: 12px;
+            fill: #333;
+          }
+          .link {
+            fill: none;
+            stroke-opacity: 0.4;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="sankey-container">
+            <svg id="sankey-chart"></svg>
+        </div>
 
-          return { nodes, links };
-        }
+        <script>
+          // --- WebView Debugging Overrides (keep these for debugging) ---
+          const originalLog = console.log;
+          const originalError = console.error;
 
-        function drawSankey({nodes, links}) {
-          const width = window.innerWidth;
-          const height = window.innerHeight;
+          console.log = (...args) => {
+              originalLog(...args);
+              if (window.ReactNativeWebView) {
+                  window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'log', message: args.join(' ') }));
+              }
+          };
 
-          const svg = d3.select("#sankey")
-            .attr("width", width)
-            .attr("height", height);
-          svg.selectAll("*").remove(); // Clear previous content
+          console.error = (...args) => {
+              originalError(...args);
+              if (window.ReactNativeWebView) {
+                  window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'error', message: args.join(' '), stack: new Error().stack }));
+              }
+          };
 
-          if (!nodes || nodes.length === 0 || !links || links.length === 0) {
-              console.warn("No valid nodes or links to draw Sankey diagram.");
-              // Display a message directly on the SVG if no data
-              svg.append("text")
-                  .attr("x", width / 2)
-                  .attr("y", height / 2)
-                  .attr("text-anchor", "middle")
-                  .attr("fill", "#666")
-                  .text("No valid flow data to display Sankey diagram.");
-              return;
+          window.onerror = function(message, source, lineno, colno, error) {
+              console.error('Unhandled JS Error:', message, source, lineno, colno, error ? error.stack : 'no stack');
+              return true;
+          };
+          // --- End Debugging Overrides ---
+
+
+          console.log('WebView JS: Script started.');
+
+          if (typeof d3 === 'undefined') {
+              console.error('WebView JS: D3.js is NOT loaded!');
+          } else {
+              console.log('WebView JS: D3.js loaded successfully.');
+          }
+          if (typeof d3.sankey === 'undefined') {
+              console.error('WebView JS: d3-sankey is NOT loaded!');
+          } else {
+              console.log('WebView JS: d3-sankey loaded successfully.');
           }
 
-          const sankeyGen = d3.sankey()
-            .nodeWidth(22)
-            .nodePadding(18)
-            .extent([[1, 1], [width - 1, height - 6]]);
+          const initialNodes = ${initialNodesJson};
+          const initialLinks = ${initialLinksJson};
 
-          try {
-            const {nodes: layoutNodes, links: layoutLinks} = sankeyGen({
+          console.log('WebView JS: Initial Nodes received:', initialNodes);
+          console.log('WebView JS: Initial Links received:', initialLinks);
+
+          const svg = d3.select("#sankey-chart");
+
+          function drawSankey({nodes, links}) {
+            console.log('WebView JS: drawSankey function called.');
+            console.log('WebView JS: Nodes for drawing:', nodes);
+            console.log('WebView JS: Links for drawing:', links);
+
+            svg.selectAll("*").remove();
+
+            const container = d3.select("#sankey-container");
+            const width = container.node() ? container.node().getBoundingClientRect().width : window.innerWidth;
+            const height = container.node() ? container.node().getBoundingClientRect().height : window.innerHeight;
+
+            svg.attr("width", width)
+               .attr("height", height)
+               .attr("viewBox", [0, 0, width, height]);
+
+
+            const sankeyGen = d3.sankey()
+              .nodeWidth(15)
+              .nodePadding(15)
+              .extent([[1, 1], [width - 1, height - 6]]);
+
+            const graph = sankeyGen({
               nodes: nodes.map(d => Object.assign({}, d)),
               links: links.map(d => Object.assign({}, d))
             });
 
             const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-            // Links
             svg.append("g")
+              .attr("class", "links")
               .selectAll("path")
-              .data(layoutLinks)
+              .data(graph.links)
               .join("path")
+                .attr("class", "link")
                 .attr("d", d3.sankeyLinkHorizontal())
-                .attr("stroke", d => color(d.source.name))
+                .attr("stroke", d => color(d.source.name || d.source.id))
                 .attr("stroke-width", d => Math.max(1, d.width))
-                .attr("fill", "none")
-                .attr("opacity", 0.5);
+                .sort((a, b) => b.width - a.width);
 
-            // Nodes
             const node = svg.append("g")
+              .attr("class", "nodes")
               .selectAll("g")
-              .data(layoutNodes)
+              .data(graph.nodes)
               .join("g")
-                .attr("transform", d => \`translate(\${d.x0},\${d.y0})\`);
+                .attr("class", "node")
+                .attr("transform", d => \`translate(\${d.x0}, \${d.y0})\`);
 
             node.append("rect")
               .attr("height", d => d.y1 - d.y0)
               .attr("width", sankeyGen.nodeWidth())
-              .attr("fill", d => color(d.name));
+              .attr("fill", d => color(d.name || d.id));
 
-            // Node text
+            // --- THE CHANGE IS HERE ---
             node.append("text")
-              .attr("x", d => d.x0 < width / 2 ? sankeyGen.nodeWidth() + 8 : -8)
+              .attr("x", d => d.x0 < width / 2 ? sankeyGen.nodeWidth() + 6 : -6)
               .attr("y", d => (d.y1 - d.y0) / 2)
               .attr("dy", "0.35em")
               .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+              // Display the node's name and its calculated value (total incoming/outgoing flow)
               .text(d => \`\${d.name} (\${d.value})\`);
+            // --- END OF CHANGE ---
 
-          } catch (e) {
-            console.error("Error drawing Sankey diagram:", e);
-            // Display an error message in the WebView
-            svg.append("text")
-                .attr("x", width / 2)
-                .attr("y", height / 2)
-                .attr("text-anchor", "middle")
-                .attr("fill", "red")
-                .text("Error rendering chart. Check console for details.");
+            console.log('WebView JS: Sankey chart drawn.');
           }
-        }
 
-        // Only attempt to draw if input is not empty
-        if (input && input.trim() !== "") {
-            const data = parseFlows(input);
-            if (data.nodes.length > 0 && data.links.length > 0) {
-                drawSankey(data);
-            } else {
-                console.warn("Parsed data is empty or invalid. No Sankey to draw.");
-                d3.select("#sankey").append("text")
-                    .attr("x", window.innerWidth / 2)
-                    .attr("y", window.innerHeight / 2)
-                    .attr("text-anchor", "middle")
-                    .attr("fill", "#666")
-                    .text("No valid flow data to display Sankey diagram.");
-            }
-        } else {
-            console.warn("Flows input is empty. No Sankey to draw.");
-             d3.select("#sankey").append("text")
-                .attr("x", window.innerWidth / 2)
-                .attr("y", window.innerHeight / 2)
-                .attr("text-anchor", "middle")
-                .attr("fill", "#666")
-                .text("No flow data available. Track applications on the home screen.");
-        }
-      </script>
-    </body>
-    </html>
-  `;
+          drawSankey({nodes: initialNodes, links: initialLinks});
+
+          window.updateChart = (newNodes, newLinks) => {
+            console.log('WebView JS: updateChart received new data:', newNodes, newLinks);
+            drawSankey({ nodes: newNodes, links: newLinks });
+          };
+          console.log('WebView JS: updateChart function exposed.');
+
+        </script>
+      </body>
+      </html>
+    `;
+  }, [nodes, links]);
+
+  // ... (rest of the React Native component, no changes needed here)
 
   return (
-    <View style={styles.container}>
-      <WebView
-        originWhitelist={['*']}
-        source={{ html: htmlContent }}
-        style={{ flex: 1, height: height, width: width }} // Ensure WebView has explicit dimensions
-        javaScriptEnabled
-        bounces={false}
-        scrollEnabled={false}
-        onError={(syntheticEvent) => {
-          const { nativeEvent } = syntheticEvent;
-          console.warn('WebView error: ', nativeEvent.description);
-        }}
-      />
-    </View>
+    <WebView
+      ref={webViewRef}
+      originWhitelist={['*']}
+      source={{ html: htmlContent }}
+      style={styles.webView}
+      javaScriptEnabled={true}
+      domStorageEnabled={true}
+      allowFileAccess={true}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  webView: {
     flex: 1,
+    backgroundColor: 'transparent',
   },
 });
+
+export default SankeyChartWebView;

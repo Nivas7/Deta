@@ -1,3 +1,4 @@
+// src/utils/constant.ts
 import { JobStatus } from "@/types";
 
 export const STATUS_OPTIONS: JobStatus[] = [
@@ -11,7 +12,7 @@ export const STATUS_OPTIONS: JobStatus[] = [
     "Withdrawn",
     "Ghosted",
     "No Answer",
-    "Declined", // Make sure this is consistent with your types
+    "Declined",
 ];
 
 export const STATUS_COLORS: Record<JobStatus, string> = {
@@ -27,7 +28,5 @@ export const STATUS_COLORS: Record<JobStatus, string> = {
     "No Answer": "#9CA3AF",     // Light Gray
     "Declined": "#B91C1C",      // Burgundy
 };
-
-
 
 export const STORAGE_KEY = 'job_applications';

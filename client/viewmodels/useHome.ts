@@ -1,57 +1,52 @@
+// src/viewmodels/useHome.ts
+
 import type { AppDispatch, RootState } from '@/app/store';
-import {
-  addApplicationAsync,
-  deleteApplication,
-  loadApplicationsAsync,
-  updateApplicationStatus,
-} from '@/state/jobSlice';
+// import { addApplicationAsync, deleteApplication, loadApplicationsAsync, updateApplicationStatus } from '@/state/jobSlice'; // Potentially remove these
 import { JobApplication, JobStatus } from '@/types';
-import { dummyApplications } from '@/utils/dummyApplications'; // Ensure this path is correct for your dummy data file
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export const useHome = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // Comment out or remove this line to temporarily stop using actual Redux state for applications
-  // const applications = useSelector((state: RootState) => state.jobs.applications);
-
-  // Use dummy data directly for testing
-  const applications = dummyApplications; // ✨ THIS IS THE KEY CHANGE ✨
+  // If Firebase is the source of truth, you wouldn't use dummyApplications here.
+  // Instead, applications would come from your Firebase data listener.
+  // For now, if you're mixing, keep this for other parts of the app that rely on it.
+  const applications = useSelector((state: RootState) => state.jobs.applications); // Get from Redux state
 
   const loading = useSelector((state: RootState) => state.jobs.loading);
 
   const refresh = useCallback(() => {
-    // If you're using dummy data, this refresh might not do anything unless
-    // you also want to simulate loading actual data, which would mean toggling this line.
-    dispatch(loadApplicationsAsync());
-  }, [dispatch]);
+    // If Firebase is sole source, this might not be needed or would trigger a Firebase re-fetch.
+    // For now, if Redux is still managing this, keep it.
+    // dispatch(loadApplicationsAsync()); // Uncomment if Redux still loads data
+  }, []); // Remove dispatch if not used
 
+  // These functions would now typically interact directly with Firebase/backend
+  // or trigger actions that then interact with Firebase.
+  // They are provided by useAnalytics in the new setup.
   const addJob = useCallback(
     (jobData: Omit<JobApplication, 'id' | 'createdAt'>) => {
-      // When using dummy data for display, this action might not visibly add to the list
-      // unless you also modify the Redux store in a way that includes dummy data for adding.
-      // For pure dummy data display, this function's effect might not be seen immediately.
-      dispatch(addApplicationAsync(jobData));
+      console.log("Add job action triggered, but Firebase is now handling data. Implement Firebase add here if needed.");
+      // If you still want Redux state to reflect Firebase data,
+      // you'd dispatch a plain Redux action here after successful Firebase write.
+      // E.g., dispatch(addApplicationSuccess(firebaseData));
     },
-    [dispatch]
+    [] // No dispatch dependency if not dispatching here
   );
 
   const updateStatus = useCallback(
     (id: string, status: JobStatus) => {
-      // This will still attempt to update Redux state, but if your 'applications'
-      // constant is *only* the dummy data, you won't see changes reflected.
-      dispatch(updateApplicationStatus({ id, status }));
+      console.log("Update status action triggered. Implement Firebase update here if needed.");
     },
-    [dispatch]
+    []
   );
 
   const deleteJob = useCallback(
     (id: string) => {
-      // Similar to updateStatus, if 'applications' is only dummy data, deletion won't persist.
-      dispatch(deleteApplication(id));
+      console.log("Delete job action triggered. Implement Firebase delete here if needed.");
     },
-    [dispatch]
+    []
   );
 
   return {
@@ -60,6 +55,7 @@ export const useHome = () => {
     refresh,
     addJob,
     updateStatus,
+    sankeyData: null, // You probably don't need sankeyData from here anymore if useAnalytics provides it
     deleteJob,
   };
 };

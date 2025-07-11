@@ -1,108 +1,55 @@
-// src/screens/AnalyticsScreen.tsx
-import { AppDispatch, RootState } from '@/app/store'; // <-- Import AppDispatch
-import { Button } from '@/presentation/components/common/Button';
-import { SankeyChartWebView } from '@/presentation/components/SankeyChart';
-import { generateAndSetSankeyFlows } from '@/state/flowSlice';
-import { useHome } from '@/viewmodels/useHome';
-import React from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+// src/presentation/screens/AnalyticsScreen.tsx
+
+import SankeyChartWebView from '@/presentation/components/SankeyChart';
+import useAnalytics from '@/viewmodels/useAnalytics';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native';
 
 export default function AnalyticsScreen() {
-    // Use the typed dispatch
-    const dispatch = useDispatch<AppDispatch>(); // <-- Change here
+    const { nodes, links, loading, refresh } = useAnalytics();
+    console.log('AnalyticsScreen nodes:', nodes);
+    console.log('AnalyticsScreen links:', links);
 
-    const { applications } = useHome();
-    const { flowsInput, loadingFlows, errorFlows } = useSelector((state: RootState) => state.flows);
-
-    const handleRefresh = () => {
-        dispatch(generateAndSetSankeyFlows(applications));
-    };
+    useEffect(() => {
+        // Initial data fetch when the component mounts
+        refresh();
+    }, []); // Empty dependency array means this runs once on mount
 
     return (
         <View style={styles.container}>
-            {/* Refresh Button */}
-            <Button
-                title={loadingFlows ? "Refreshing..." : "Refresh Diagram"}
-                onPress={handleRefresh}
-                disabled={loadingFlows}
-                style={styles.refreshButton}
-            />
-
-            {/* Loading Indicator */}
-            {loadingFlows && (
-                <View style={styles.loadingOverlay}>
-                    <ActivityIndicator size="large" color="#0000ff" />
-                    <Text style={styles.loadingText}>Generating diagram...</Text>
+            <Button title="Refresh" onPress={refresh} />
+            {loading ? (
+                <ActivityIndicator size="large" style={{ marginTop: 20 }} />
+            ) : nodes.length > 0 && links.length > 0 ? (
+                // Give chartContainer flex: 1 so it takes up available space
+                <View style={styles.chartContainer}>
+                    <SankeyChartWebView nodes={nodes} links={links} />
                 </View>
+            ) : (
+                // You might want to add a message here if no data is available
+                <Text>No analytics data available. Tap refresh to load.</Text>
             )}
-
-            {/* Error Message */}
-            {errorFlows && (
-                <Text style={styles.errorText}>Error: {errorFlows}</Text>
-            )}
-
-            {/* Debug Display */}
-            <Text style={styles.debugHeader}>Flows Data (for Debugging):</Text>
-            <ScrollView style={styles.debugContainer}>
-                <Text style={styles.debugText}>{flowsInput || 'No flow data generated yet.'}</Text>
-            </ScrollView>
-            <View style={styles.chartContainer}>
-                <SankeyChartWebView flows={flowsInput} />
-            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        padding: 10,
-        backgroundColor: '#f0f0f0',
-    },
-    refreshButton: {
-        marginBottom: 10,
-        alignSelf: 'center',
-    },
-    loadingOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: '#333',
-    },
-    errorText: {
-        color: 'red',
-        textAlign: 'center',
-        marginBottom: 10,
-        fontSize: 14,
-    },
-    debugHeader: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBottom: 5,
-        color: '#333',
-    },
-    debugContainer: {
-        height: 100,
-        backgroundColor: '#fff',
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
-        padding: 8,
-        marginBottom: 10,
-    },
-    debugText: {
-        fontSize: 12,
-        color: '#555',
-        fontFamily: 'monospace',
+        flex: 1, // Crucial: Make the main container take full height
+        paddingTop: 50,
+        paddingHorizontal: 16,
+        backgroundColor: '#f0f0f0', // Just for better visual debugging
     },
     chartContainer: {
-        flex: 1,
+        flex: 1, // Crucial: Make this container fill the remaining space
+        marginTop: 20,
+        // Add a background color for debugging to see its bounds
+        backgroundColor: 'lightblue',
     },
+    noDataText: {
+        textAlign: 'center',
+        marginTop: 50,
+        fontSize: 16,
+        color: '#666',
+    }
 });
