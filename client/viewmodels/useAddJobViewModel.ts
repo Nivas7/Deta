@@ -1,6 +1,6 @@
 // src/viewmodels/useAddJobViewModel.ts
-import { AppDispatch } from '@/app/store';
 import { addApplicationAsync } from '@/state/jobSlice';
+import { AppDispatch } from '@/state/store';
 import { AddJobFormData, AddJobFormErrors, JobStatus } from '@/types'; // Import the correct types
 import { router } from 'expo-router';
 import { useState } from 'react';

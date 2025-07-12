@@ -1,6 +1,6 @@
 // src/viewmodels/useHome.ts
 
-import type { AppDispatch, RootState } from '@/app/store';
+import type { AppDispatch, RootState } from '@/state/store';
 // import { addApplicationAsync, deleteApplication, loadApplicationsAsync, updateApplicationStatus } from '@/state/jobSlice'; // Potentially remove these
 import { JobApplication, JobStatus } from '@/types';
 import { useCallback } from 'react';

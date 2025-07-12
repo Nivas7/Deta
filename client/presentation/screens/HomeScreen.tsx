@@ -6,9 +6,9 @@ import React from 'react';
 import { RefreshControl, ScrollView, Text, View } from 'react-native'; // Removed StyleSheet, TextInput, Platform, TouchableOpacity
 import { useDispatch } from 'react-redux';
 
-import { AppDispatch } from '@/app/store';
 import { JobCard } from '@/presentation/components/card/cards';
 import { Button } from '@/presentation/components/common/Button';
+import { AppDispatch } from '@/state/store';
 import { globalStyles } from '@/styles/global';
 import { JobApplication } from '@/types';
 import { useHome } from '@/viewmodels/useHome';

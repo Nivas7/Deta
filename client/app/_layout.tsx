@@ -1,4 +1,4 @@
-import { store } from '@/app/store';
+import { store } from '@/state/store';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, StatusBar as RNStatusBar, View } from 'react-native';
