@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/state/hooks';
 import { loadApplicationsAsync } from '@/state/jobSlice';
-import { SankeyLink, SankeyNode } from '@/types';
+import { JobStatus, SankeyLink, SankeyNode, Totals } from '@/types';
 import { useCallback, useMemo, useState } from 'react';
 
 const statusPathMap: Record<string, string[]> = {
@@ -76,5 +76,20 @@ export default function useAnalytics() {
     }
   }, [dispatch]);
 
-  return { nodes, links, loading, error, refresh };
+
+  const totals: Totals = useMemo(() => {
+    const total = applications.length;
+
+    const statusCounts = applications.reduce((acc, app) => {
+      acc[app.status as JobStatus] = (acc[app.status as JobStatus] || 0) + 1;
+      return acc;
+    }, {} as Partial<Record<JobStatus, number>>);
+
+    return {
+      total,
+      ...statusCounts,
+    };
+  }, [applications]);
+
+  return { nodes, links, loading, error, refresh, totals };
 }

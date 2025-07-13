@@ -13,6 +13,12 @@ export interface StatusHistoryEntry {
   timestamp: string;
 }
 
+
+export type Totals = {
+  total: number;
+} & Partial<Record<JobStatus, number>>;
+
+
 export interface JobApplication {
   id: string;
   companyName: string;

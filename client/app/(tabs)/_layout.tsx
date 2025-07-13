@@ -1,6 +1,7 @@
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { HapticTab } from '@/presentation/components/HapticTab';
 
 export default function TabLayout() {
   return (
@@ -30,6 +31,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="home" size={size} color={color} />
           ),
+          tabBarButton: (props) => <HapticTab {...props} />,
         }}
       />
       <Tabs.Screen
@@ -39,6 +41,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="list" size={size} color={color} />
           ),
+          tabBarButton: (props) => <HapticTab {...props} />,
         }}
       />
       <Tabs.Screen
@@ -48,6 +51,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="analytics" size={size} color={color} />
           ),
+          tabBarButton: (props) => <HapticTab {...props} />,
         }}
       />
     </Tabs>

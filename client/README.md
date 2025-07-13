@@ -4,12 +4,15 @@
 # Welcome Deta 👋
 
 **Deta, a React Native application designed for comprehensive job application tracking and analytics.**
-
+    
+## Features
+    - Built Based on Mvvm Architecture and Clean Architecture
+    - Fully Responsive UI
 ## Preview
 
 <div align="center">
   <img src="assets/images/Preview/Deta_Home.jpg" alt="Deta Home" width="300"/>
-  <img src="assets/images/Preview/Deta_history.jpg" alt="Deta History" width="300"/>
+  <img src="assets/images/Preview/Deta_History.jpg" alt="Deta History" width="300"/>
   <img src="assets/images/Preview/Deta_Analytics.jpg" alt="Deta Analytics" width="300"/>
 </div>
 
@@ -19,20 +22,4 @@ If you are interested in using the beta version or want to provide feedback, ple
 
 
 
-# New folder structure for MVVM and Clean Architecture
-
-- client/
-  - app/
-    - components/
-    - domain/
-    - hooks/
-    - modal/
-      - viewmodels/
-      - AddJobModal.tsx
-    - services/
-    - utils/
-    - styles/
-  - assets/
-  - App.tsx
-  - index.tsx
 

@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from 'react';
-import { StyleSheet } from 'react-native'; // Import StyleSheet for better styling
+import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 import { SankeyLink, SankeyNode } from '@/types';
@@ -32,32 +32,31 @@ const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
         <style>
           body {
             margin: 0;
-            overflow: hidden;
+            overflow: auto;
             font-family: sans-serif;
             background: #f9f9f9;
           }
           #sankey-container {
-            width: 100vw;
-            height: 100vh;
+            width: 120vw;
+            height: 150vw;
             display: flex;
             justify-content: center;
             align-items: center;
-          }
+          } 
           svg {
             background: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
           }
           .node rect {
             stroke: #333;
           }
           .node text {
-            font-size: 12px;
+            font-size: 14px;
             fill: #333;
           }
           .link {
             fill: none;
-            stroke-opacity: 0.4;
+            stroke-opacity: 0.5;
           }
         </style>
       </head>
@@ -67,7 +66,6 @@ const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
         </div>
 
         <script>
-          // --- WebView Debugging Overrides (keep these for debugging) ---
           const originalLog = console.log;
           const originalError = console.error;
 
@@ -90,8 +88,6 @@ const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
               return true;
           };
 
-
-          console.log('WebView JS: Script started.');
 
           if (typeof d3 === 'undefined') {
               console.error('WebView JS: D3.js is NOT loaded!');
@@ -120,18 +116,18 @@ const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
             svg.selectAll("*").remove();
 
             const container = d3.select("#sankey-container");
-            const width = container.node() ? container.node().getBoundingClientRect().width : window.innerWidth;
-            const height = container.node() ? container.node().getBoundingClientRect().height : window.innerHeight;
+            const width = Math.min(800, container.node() ? container.node().getBoundingClientRect().width : window.innerWidth);
+            const height = Math.min(400, container.node() ? container.node().getBoundingClientRect().height : window.innerHeight);
 
             svg.attr("width", width)
                .attr("height", height)
                .attr("viewBox", [0, 0, width, height]);
 
 
-            const sankeyGen = d3.sankey()
-              .nodeWidth(15)
-              .nodePadding(15)
-              .extent([[1, 1], [width - 1, height - 6]]);
+             const sankeyGen = d3.sankey()
+              .nodeWidth(20)
+              .nodePadding(20)
+              .extent([[0, 5], [width - 5, height - 5]]);
 
             const graph = sankeyGen({
               nodes: nodes.map(d => Object.assign({}, d)),
@@ -148,7 +144,7 @@ const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
                 .attr("class", "link")
                 .attr("d", d3.sankeyLinkHorizontal())
                 .attr("stroke", d => color(d.source.name || d.source.id))
-                .attr("stroke-width", d => Math.max(1, d.width))
+                .attr("stroke-width", d => Math.max(2, d.width))
                 .sort((a, b) => b.width - a.width);
 
             const node = svg.append("g")
@@ -160,9 +156,11 @@ const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
                 .attr("transform", d => \`translate(\${d.x0}, \${d.y0})\`);
 
             node.append("rect")
-              .attr("height", d => d.y1 - d.y0)
+              .attr("height", d => Math.max(1, d.y1 - d.y0))
               .attr("width", sankeyGen.nodeWidth())
-              .attr("fill", d => color(d.name || d.id));
+              .attr("fill", d => color(d.name || d.id))
+              .attr("rx", 4) // Rounded corners for nodes
+              .attr("ry", 4);
 
             node.append("text")
               .attr("x", d => d.x0 < width / 2 ? sankeyGen.nodeWidth() + 6 : -6)
