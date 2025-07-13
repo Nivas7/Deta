@@ -1,10 +1,7 @@
-// src/presentation/components/SankeyChart.tsx
-
 import React, { useMemo, useRef } from 'react';
 import { StyleSheet } from 'react-native'; // Import StyleSheet for better styling
 import { WebView } from 'react-native-webview';
 
-// Import your types
 import { SankeyLink, SankeyNode } from '@/types';
 
 interface SankeyChartWebViewProps {
@@ -12,9 +9,6 @@ interface SankeyChartWebViewProps {
   links: SankeyLink[];
 }
 
-// src/presentation/components/SankeyChart.tsx
-
-// ... (previous imports and component setup)
 
 const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
   nodes,
@@ -95,7 +89,6 @@ const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
               console.error('Unhandled JS Error:', message, source, lineno, colno, error ? error.stack : 'no stack');
               return true;
           };
-          // --- End Debugging Overrides ---
 
 
           console.log('WebView JS: Script started.');
@@ -171,15 +164,12 @@ const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
               .attr("width", sankeyGen.nodeWidth())
               .attr("fill", d => color(d.name || d.id));
 
-            // --- THE CHANGE IS HERE ---
             node.append("text")
               .attr("x", d => d.x0 < width / 2 ? sankeyGen.nodeWidth() + 6 : -6)
               .attr("y", d => (d.y1 - d.y0) / 2)
               .attr("dy", "0.35em")
               .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
-              // Display the node's name and its calculated value (total incoming/outgoing flow)
               .text(d => \`\${d.name} (\${d.value})\`);
-            // --- END OF CHANGE ---
 
             console.log('WebView JS: Sankey chart drawn.');
           }
@@ -198,7 +188,6 @@ const SankeyChartWebView: React.FC<SankeyChartWebViewProps> = ({
     `;
   }, [nodes, links]);
 
-  // ... (rest of the React Native component, no changes needed here)
 
   return (
     <WebView

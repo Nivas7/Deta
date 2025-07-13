@@ -1,5 +1,4 @@
-// src/state/jobSlice.ts
-import { JobApplication, JobStatus } from '@/types'; // Import StatusHistoryEntry
+import { JobApplication, JobStatus } from '@/types';
 import { loadApplications, saveApplications } from '@/utils/storage';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -15,55 +14,47 @@ const initialState: JobState = {
   error: null,
 };
 
-// Load Applications
-export const loadApplicationsAsync = createAsyncThunk(
+export const loadApplicationsAsync = createAsyncThunk<JobApplication[], void>(
   'jobs/loadApplications',
   async () => {
     const apps = await loadApplications();
-    // Ensure statusHistory exists for older entries if not present
-    // This is a migration step for existing data
     return apps.map(app => ({
       ...app,
       statusHistory: app.statusHistory || [{ status: app.status, timestamp: app.createdAt || new Date().toISOString() }],
-      createdAt: app.createdAt || new Date().toISOString(), // Ensure createdAt is set
-      updatedAt: app.updatedAt || app.createdAt || new Date().toISOString(), // Ensure updatedAt is set
+      createdAt: app.createdAt || new Date().toISOString(),
+      updatedAt: app.updatedAt || app.createdAt || new Date().toISOString(),
     }));
   }
 );
 
-// Add Application - Fixed payload type and statusHistory generation
-export const addApplicationAsync = createAsyncThunk(
+export const addApplicationAsync = createAsyncThunk<
+  JobApplication[],
+  {
+    companyName: string;
+    position: string;
+    notes?: string;
+    dateApplied: string;
+    initialStatus: JobStatus;
+    interviewDate?: string;
+    interviewType?: string;
+    interviewRound?: string;
+  }
+>(
   'jobs/addApplication',
-  async (
-    // Define the exact payload shape this thunk expects from the ViewModel
-    jobInput: {
-      companyName: string;
-      position: string;
-      notes?: string;
-      dateApplied: string; // YYYY-MM-DD string
-      initialStatus: JobStatus;
-      // Include interview fields if the form collects them
-      interviewDate?: string; // YYYY-MM-DD string
-      interviewType?: string;
-      interviewRound?: string;
-    },
-    { getState }
-  ) => {
+  async (jobInput, { getState }) => {
     const state = getState() as { jobs: JobState };
     const now = new Date().toISOString();
 
     const newJob: JobApplication = {
-      id: Date.now().toString(), // Simple unique ID
+      id: Date.now().toString(),
       companyName: jobInput.companyName,
       position: jobInput.position,
-      dateApplied: jobInput.dateApplied, // From form
-      status: jobInput.initialStatus, // Initial status from form
+      dateApplied: jobInput.dateApplied,
+      status: jobInput.initialStatus,
       notes: jobInput.notes,
       createdAt: now,
       updatedAt: now,
-      statusHistory: [{ status: jobInput.initialStatus, timestamp: now }], // Initial history entry
-
-      // Include optional interview details if provided
+      statusHistory: [{ status: jobInput.initialStatus, timestamp: now }],
       ...(jobInput.interviewDate && { interviewDate: jobInput.interviewDate }),
       ...(jobInput.interviewType && { interviewType: jobInput.interviewType }),
       ...(jobInput.interviewRound && { interviewRound: jobInput.interviewRound }),
@@ -75,10 +66,13 @@ export const addApplicationAsync = createAsyncThunk(
   }
 );
 
-// Update Status - Ensure statusHistory is updated
-export const updateApplicationStatus = createAsyncThunk(
+// Update Status
+export const updateApplicationStatus = createAsyncThunk<
+  JobApplication[],
+  { id: string; status: JobStatus }
+>(
   'jobs/updateApplicationStatus',
-  async ({ id, status }: { id: string; status: JobStatus }, { getState }) => {
+  async ({ id, status }, { getState }) => {
     const state = getState() as { jobs: JobState };
     const now = new Date().toISOString();
     const updated = state.jobs.applications.map(app =>
@@ -87,7 +81,6 @@ export const updateApplicationStatus = createAsyncThunk(
           ...app,
           status,
           updatedAt: now,
-          // Ensure statusHistory is an array, then add the new entry
           statusHistory: [...(app.statusHistory || []), { status, timestamp: now }],
         }
         : app
@@ -97,10 +90,10 @@ export const updateApplicationStatus = createAsyncThunk(
   }
 );
 
-// Delete Application (no changes needed)
-export const deleteApplication = createAsyncThunk(
+// Delete Application
+export const deleteApplication = createAsyncThunk<JobApplication[], string>(
   'jobs/deleteApplication',
-  async (id: string, { getState }) => {
+  async (id, { getState }) => {
     const state = getState() as { jobs: JobState };
     const updated = state.jobs.applications.filter(app => app.id !== id);
     await saveApplications(updated);
@@ -114,8 +107,10 @@ export const jobSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
+      // loadApplicationsAsync
       .addCase(loadApplicationsAsync.pending, state => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(loadApplicationsAsync.fulfilled, (state, action: PayloadAction<JobApplication[]>) => {
         state.applications = action.payload;
@@ -126,14 +121,47 @@ export const jobSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Failed to load applications';
       })
+      // addApplicationAsync
+      .addCase(addApplicationAsync.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(addApplicationAsync.fulfilled, (state, action: PayloadAction<JobApplication[]>) => {
         state.applications = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(addApplicationAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to add application';
+      })
+      // updateApplicationStatus
+      .addCase(updateApplicationStatus.pending, state => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(updateApplicationStatus.fulfilled, (state, action: PayloadAction<JobApplication[]>) => {
         state.applications = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(updateApplicationStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to update application status';
+      })
+      // deleteApplication
+      .addCase(deleteApplication.pending, state => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(deleteApplication.fulfilled, (state, action: PayloadAction<JobApplication[]>) => {
         state.applications = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(deleteApplication.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to delete application';
       });
   },
 });

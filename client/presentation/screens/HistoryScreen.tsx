@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { JobCard } from '@/presentation/components/card/cards';
 import { Button } from '@/presentation/components/common/Button';
@@ -13,19 +14,12 @@ import { useHistory } from '@/viewmodels/useHistory';
 export default function HistoryScreen() {
   const {
     applications,
-    loading,
     refreshing,
     refresh,
     deleteApplication,
     updateApplicationStatus,
-    setRefreshing,
   } = useHistory();
-
   const [filterStatus, setFilterStatus] = useState<JobStatus | 'All'>('All');
-
-  const onRefresh = async () => {
-    await refresh();
-  };
 
   const filteredApplications = filterStatus === 'All'
     ? applications
@@ -36,14 +30,11 @@ export default function HistoryScreen() {
   );
 
   return (
-    <ScrollView
-      style={globalStyles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={globalStyles.content}>
-        {/* Header */}
+    <SafeAreaView style={globalStyles.container}>
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+        contentContainerStyle={globalStyles.content}
+      >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <View>
             <Text style={globalStyles.header}>Application History</Text>
@@ -74,7 +65,6 @@ export default function HistoryScreen() {
           </View>
         ) : (
           <>
-            {/* Filter Pills */}
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -99,11 +89,9 @@ export default function HistoryScreen() {
                   All ({applications.length})
                 </Text>
               </TouchableOpacity>
-
               {STATUS_OPTIONS.map(status => {
                 const count = applications.filter(app => app.status === status).length;
                 if (count === 0) return null;
-
                 return (
                   <TouchableOpacity
                     key={status}
@@ -127,17 +115,14 @@ export default function HistoryScreen() {
                 );
               })}
             </ScrollView>
-
-            {/* Applications List */}
             <Text style={{
               fontSize: 16,
               fontWeight: '600',
               color: '#374151',
-              marginBottom: 12
+              marginBottom: 12,
             }}>
               {filterStatus === 'All' ? 'All Applications' : `${filterStatus} Applications`} ({filteredApplications.length})
             </Text>
-
             {sortedApplications.map(job => (
               <JobCard
                 key={job.id}
@@ -148,7 +133,7 @@ export default function HistoryScreen() {
             ))}
           </>
         )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

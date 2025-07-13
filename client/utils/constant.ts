@@ -1,32 +1,25 @@
-// src/utils/constant.ts
-import { JobStatus } from "@/types";
+import { JobStatus } from '@/types';
 
 export const STATUS_OPTIONS: JobStatus[] = [
-    "Applied",
-    "Interviewed",
-    "Offered",
-    "Accepted",
-    "Rejected",
-    "Offer Declined",
-    "No Offer",
-    "Withdrawn",
-    "Ghosted",
-    "No Answer",
-    "Declined",
+  'Interviewed',
+  'Offered',
+  'Accepted',
+  'Rejected',
+  'No Offer',
+  'Withdrawn',
+  'Ghosted',
+  'Declined',
 ];
 
 export const STATUS_COLORS: Record<JobStatus, string> = {
-    "Applied": "#3B82F6",       // Blue
-    "Interviewed": "#F59E0B",   // Amber
-    "Offered": "#10B981",       // Green
-    "Accepted": "#059669",      // Dark Green
-    "Rejected": "#EF4444",      // Red
-    "Offer Declined": "#DC2626", // Dark Red
-    "No Offer": "#F97316",      // Orange
-    "Withdrawn": "#A8A29E",     // Stone
-    "Ghosted": "#6B7280",       // Gray
-    "No Answer": "#9CA3AF",     // Light Gray
-    "Declined": "#B91C1C",      // Burgundy
+  Interviewed: '#F59E0B',
+  Offered: '#10B981',
+  Accepted: '#059669',
+  Rejected: '#EF4444',
+  'No Offer': '#F97316',
+  Withdrawn: '#A8A29E',
+  Ghosted: '#6B7280',
+  Declined: '#B91C1C',
 };
 
 export const STORAGE_KEY = 'job_applications';

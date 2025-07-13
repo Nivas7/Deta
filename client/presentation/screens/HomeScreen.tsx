@@ -1,9 +1,9 @@
-// src/screens/HomeScreen.tsx
-import { generateAndSetSankeyFlows } from '@/state/flowSlice'; // Import the new thunk
+
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { RefreshControl, ScrollView, Text, View } from 'react-native'; // Removed StyleSheet, TextInput, Platform, TouchableOpacity
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
 
 import { JobCard } from '@/presentation/components/card/cards';
@@ -14,43 +14,23 @@ import { JobApplication } from '@/types';
 import { useHome } from '@/viewmodels/useHome';
 
 export default function HomeScreen() {
-  const {
-    applications,
-    loading,
-    refresh,
-    updateStatus,
-    deleteJob
-  } = useHome();
-
+  const { applications, loading, refresh, updateStatus, deleteJob } = useHome();
   const dispatch = useDispatch<AppDispatch>();
-
   const recentApplications = applications.slice(0, 5);
   const hasApplications = applications.length > 0;
 
-  const handleDeleteJob = (id: string) => {
-    deleteJob(id);
-  };
-
-  const handleGoToAnalytics = () => {
-    // Dispatch the thunk with the current applications data
-    // This dispatch now correctly understands thunks
-    dispatch(generateAndSetSankeyFlows(applications));
-    router.push('/Analytics');
-  };
-
   return (
-    <ScrollView
-      style={globalStyles.container}
-      refreshControl={
-        <RefreshControl refreshing={loading} onRefresh={refresh} />
-      }
-    >
-      <View style={globalStyles.content}>
-        {/* Welcome Section */}
+    <SafeAreaView style={[globalStyles.container, { flex: 1 }]}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={refresh} />
+        }
+        contentContainerStyle={[globalStyles.content, { flexGrow: 1, padding: 16 }]}
+      >
         <View style={globalStyles.card}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
             <Ionicons name="briefcase-outline" size={24} color="#3B82F6" />
-            <Text style={[globalStyles.header, { marginLeft: 12, marginBottom: 0, fontSize: 24 }]}>
+            <Text style={[globalStyles.header, { marginLeft: 12, fontSize: 24 }]}>
               Welcome Back!
             </Text>
           </View>
@@ -59,16 +39,14 @@ export default function HomeScreen() {
               ? `You have ${applications.length} job applications tracked`
               : 'Start tracking your job applications today'}
           </Text>
-
           <Button
             title="Add New Application"
-            onPress={() => router.push('/AddJobScreen')} // Navigates to a separate screen for adding jobs
+            onPress={() => router.push('/AddJobScreen')}
             disabled={false}
             style={{ marginTop: 12 }}
           />
         </View>
 
-        {/* Quick Stats */}
         {hasApplications && (
           <View style={globalStyles.card}>
             <Text style={[globalStyles.header, { fontSize: 20, marginBottom: 16 }]}>
@@ -81,20 +59,19 @@ export default function HomeScreen() {
               </View>
               <View style={globalStyles.statCard}>
                 <Text style={globalStyles.statNumber}>
-                  {/* Keep filter for 'Applied' here for display, even if not a selectable status */}
-                  {applications.filter((app) => app.status === 'Applied').length}
+                  {applications.filter((app: JobApplication) => app.status === 'Rejected').length}
                 </Text>
-                <Text style={globalStyles.statLabel}>Applied</Text>
+                <Text style={globalStyles.statLabel}>Rejected</Text>
               </View>
               <View style={globalStyles.statCard}>
                 <Text style={globalStyles.statNumber}>
-                  {applications.filter((app) => app.status === 'Interviewed').length}
+                  {applications.filter((app: JobApplication) => app.status === 'Interviewed').length}
                 </Text>
                 <Text style={globalStyles.statLabel}>Interviewed</Text>
               </View>
               <View style={globalStyles.statCard}>
                 <Text style={globalStyles.statNumber}>
-                  {applications.filter((app) => app.status === 'Accepted').length}
+                  {applications.filter((app: JobApplication) => app.status === 'Accepted').length}
                 </Text>
                 <Text style={globalStyles.statLabel}>Accepted</Text>
               </View>
@@ -102,11 +79,10 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Recent Applications */}
         {hasApplications ? (
           <View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <Text style={[globalStyles.header, { fontSize: 20, marginBottom: 0 }]}>
+              <Text style={[globalStyles.header, { fontSize: 20 }]}>
                 Recent Applications
               </Text>
               <Button
@@ -117,13 +93,12 @@ export default function HomeScreen() {
                 style={{ paddingHorizontal: 16, paddingVertical: 8 }}
               />
             </View>
-
             {recentApplications.map((job: JobApplication) => (
               <JobCard
                 key={job.id}
                 job={job}
                 onStatusUpdate={updateStatus}
-                onDelete={handleDeleteJob}
+                onDelete={deleteJob}
               />
             ))}
           </View>
@@ -132,33 +107,31 @@ export default function HomeScreen() {
             <Ionicons name="document-text-outline" size={64} color="#9CA3AF" />
             <Text style={globalStyles.emptyStateText}>No Applications Yet</Text>
             <Text style={globalStyles.emptyStateSubtext}>
-              Start by adding your first job application to track your progress and visualize your journey.
+              Start by adding your first job application to track your progress.
             </Text>
             <Button
-              disabled={false}
               title="Add Your First Application"
-              onPress={() => router.push('/AddJobScreen')} // Navigates to add screen
+              onPress={() => router.push('/AddJobScreen')}
+              disabled={false}
             />
           </View>
         )}
 
-        {/* Analytics Button */}
         <View style={globalStyles.card}>
           <Text style={[globalStyles.header, { fontSize: 20, marginBottom: 8 }]}>
             Visualize Your Application Journey 📈
           </Text>
           <Text style={globalStyles.subHeader}>
-            Click below to see a Sankey diagram illustrating the flow of your job applications through different stages.
+            View a Sankey diagram of your job application stages.
           </Text>
           <Button
             title="Go to Analytics"
-            onPress={handleGoToAnalytics}
+            onPress={() => router.push('/Analytics')}
             style={{ marginTop: 20 }}
             disabled={!hasApplications}
           />
         </View>
-
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
