@@ -1,7 +1,6 @@
-// src/viewmodels/useAddJobViewModel.ts
 import { addApplicationAsync } from '@/state/jobSlice';
 import { AppDispatch } from '@/state/store';
-import { AddJobFormData, AddJobFormErrors, JobStatus } from '@/types'; // Import the correct types
+import { AddJobFormData, AddJobFormErrors, JobStatus } from '@/types';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -33,7 +32,6 @@ export const useAddJobViewModel = () => {
     if (!formData.position.trim()) {
       newErrors.position = 'Position is required.';
     }
-    // Add other validations as needed
 
     setErrors(newErrors);
 

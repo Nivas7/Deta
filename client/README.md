@@ -11,9 +11,9 @@
 ## Preview
 
 <div align="center">
-  <img src="assets/images/Preview/Deta_Home.jpg" alt="Deta Home" width="300"/>
-  <img src="assets/images/Preview/Deta_History.jpg" alt="Deta History" width="300"/>
-  <img src="assets/images/Preview/Deta_Analytics.jpg" alt="Deta Analytics" width="300"/>
+  <img src="../Preview/Deta_Home.jpg" alt="Deta Home" width="300"/>
+  <img src="../Preview/Deta_History.jpg" alt="Deta History" width="300"/>
+  <img src="../Preview/Deta_Analytics.jpg" alt="Deta Analytics" width="300"/>
 </div>
 
 ## Beta Access & Feedback

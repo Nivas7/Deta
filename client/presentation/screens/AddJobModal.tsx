@@ -23,7 +23,6 @@ export default function AddJobModal() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showInterviewDatePicker, setShowInterviewDatePicker] = useState(false);
 
-
   const onChangeDateApplied = (event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {

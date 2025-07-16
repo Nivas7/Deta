@@ -2,10 +2,17 @@ import { store } from '@/state/store';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Provider } from 'react-redux';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from 'react';
+import SplashScreen from '@/presentation/screens/SpalshScreen';
 
 export default function RootLayout() {
-  const insets = useSafeAreaInsets();
+
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+  }
 
   return (
     <Provider store={store}>

@@ -1,4 +1,3 @@
-
 import SankeyChartWebView from '@/presentation/components/SankeyChart';
 import useAnalytics from '@/viewmodels/useAnalytics';
 import React, { useEffect } from 'react';
@@ -22,10 +21,10 @@ export default function AnalyticsScreen() {
         <>
           <View style={styles.summaryBox}>
             <Text style={styles.summaryTitle}>📊 Summary</Text>
-            <Text>Total Applications: {totals.total}</Text>
-            <Text>Accepted: {totals['Accepted'] || 0}</Text>
-            <Text>Rejected: {totals['Rejected'] || 0}</Text>
-            <Text>Withdrawn: {totals['Withdrawn'] || 0}</Text>
+            <Text style={styles.summaryItem}>Total Applications: {totals.total}</Text>
+            <Text style={styles.summaryItem}>Accepted: {totals['Accepted'] || 0}</Text>
+            <Text style={styles.summaryItem}>Rejected: {totals['Rejected'] || 0}</Text>
+            <Text style={styles.summaryItem}>Withdrawn: {totals['Withdrawn'] || 0}</Text>
           </View>
 
           <View style={styles.chartContainer}>
@@ -33,7 +32,9 @@ export default function AnalyticsScreen() {
           </View>
         </>
       ) : (
-        <Text style={styles.noDataText}>No analytics data available. Tap refresh to load.</Text>
+        <Text style={styles.noDataText}>
+          No analytics data available. Tap refresh to load.
+        </Text>
       )}
     </View>
   );
@@ -47,25 +48,31 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   summaryBox: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 16,
-    elevation: 2,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 20,
+    marginTop: 20,
+    elevation: 4, // Android shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 6,
   },
   summaryTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 12,
+    color: '#333',
+  },
+  summaryItem: {
+    fontSize: 16,
+    marginVertical: 4,
+    color: '#555',
   },
   chartContainer: {
     flex: 1,
     marginTop: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     overflow: 'hidden',
   },
