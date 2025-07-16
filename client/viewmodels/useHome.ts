@@ -1,4 +1,4 @@
-; import { deleteApplication, loadApplicationsAsync, updateApplicationStatus } from '@/state/jobSlice';
+import { deleteApplication, loadApplicationsAsync, updateApplicationStatus } from '@/state/jobSlice';
 import { AppDispatch } from '@/state/store';
 import { JobStatus } from '@/types';
 import { useCallback } from 'react';

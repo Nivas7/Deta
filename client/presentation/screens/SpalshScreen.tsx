@@ -16,7 +16,7 @@ export default function SplashScreen({ onFinish }: Props) {
     if (isReady) {
       Animated.timing(opacity, {
         toValue: 0,
-        duration: 800,
+        duration: 600,
         useNativeDriver: true,
       }).start(async () => {
         await SplashScreenAPI.hideAsync();
@@ -29,8 +29,8 @@ export default function SplashScreen({ onFinish }: Props) {
     <Animated.View style={[styles.container, { opacity }]}>
       <Image
         source={require('../../assets/images/spalsh.png')}
-        style={{ width: 300, height: 300 }}
-        resizeMode="cover"
+        style={{ width: 200, height: 200 }}
+        resizeMode="contain"
       />
     </Animated.View>
   );
@@ -39,7 +39,7 @@ export default function SplashScreen({ onFinish }: Props) {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000000',
+    backgroundColor: '#000', // Your splash bg
     alignItems: 'center',
     justifyContent: 'center',
   },

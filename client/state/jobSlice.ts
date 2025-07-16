@@ -1,12 +1,7 @@
-import { JobApplication, JobStatus } from '@/types';
+import { JobApplication, JobState, JobStatus } from '@/types';
 import { loadApplications, saveApplications } from '@/utils/storage';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export interface JobState {
-  applications: JobApplication[];
-  loading: boolean;
-  error: string | null;
-}
 
 const initialState: JobState = {
   applications: [],

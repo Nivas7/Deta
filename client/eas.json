@@ -9,14 +9,16 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "production": {
       "android": {
         "buildType": "apk"
       },
-    },
-    "production": {
-      "autoIncrement": true
-    }
+      "ios": {
+        "simulator": true
+      }
   },
   "submit": {
     "production": {}

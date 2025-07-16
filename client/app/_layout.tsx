@@ -1,13 +1,12 @@
-import { store } from '@/state/store';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { Provider } from 'react-redux';
+import { store } from '@/state/store';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import SplashScreen from '@/presentation/screens/SpalshScreen';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
 export default function RootLayout() {
-
   const [showSplash, setShowSplash] = useState(true);
 
   if (showSplash) {
@@ -17,7 +16,7 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-        <StatusBar style="dark" translucent={true} />
+        <StatusBar style="dark" translucent />
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
@@ -25,9 +24,7 @@ export default function RootLayout() {
             options={{
               presentation: 'modal',
               title: 'Add Job Application',
-              headerStyle: {
-                backgroundColor: '#FFFFFF',
-              },
+              headerStyle: { backgroundColor: '#FFFFFF' },
               headerTitleStyle: {
                 fontSize: 18,
                 fontWeight: '600',

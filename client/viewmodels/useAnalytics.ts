@@ -1,19 +1,8 @@
 import { useAppDispatch, useAppSelector } from '@/state/hooks';
 import { loadApplicationsAsync } from '@/state/jobSlice';
 import { JobStatus, SankeyLink, SankeyNode, Totals } from '@/types';
+import { statusPathMap } from '@/utils/constant';
 import { useCallback, useMemo, useState } from 'react';
-
-const statusPathMap: Record<string, string[]> = {
-  Rejected: ['Applications', 'Rejected'],
-  Interviewed: ['Applications', 'Interviews'],
-  Ghosted: ['Applications', 'Interviews', 'Ghosted'],
-  'No Offer': ['Applications', 'Interviews', 'No Offer'],
-  Offered: ['Applications', 'Interviews', 'Offers'],
-  Accepted: ['Applications', 'Interviews', 'Offers', 'Accepted'],
-  Declined: ['Applications', 'Interviews', 'Offers', 'Declined'],
-  'Offer Declined': ['Applications', 'Interviews', 'Offers', 'Declined'],
-  Withdrawn: ['Applications', 'Withdrawn'],
-};
 
 export default function useAnalytics() {
   const dispatch = useAppDispatch();

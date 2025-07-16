@@ -1,23 +1,40 @@
-
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
-import { RefreshControl, ScrollView, Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, FlatList, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch } from 'react-redux';
-
 import { JobCard } from '@/presentation/components/card/cards';
 import { Button } from '@/presentation/components/common/Button';
-import { AppDispatch } from '@/state/store';
 import { globalStyles } from '@/styles/global';
 import { JobApplication } from '@/types';
+import { STATUS_COLORS } from '@/utils/constant';
 import { useHome } from '@/viewmodels/useHome';
 
 export default function HomeScreen() {
-  const { applications, loading, refresh, updateStatus, deleteJob } = useHome();
-  const dispatch = useDispatch<AppDispatch>();
+  const { applications, loading, error, refresh, updateStatus, deleteJob } = useHome();
   const recentApplications = applications.slice(0, 5);
   const hasApplications = applications.length > 0;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
+
+  if (error) {
+    return (
+      <SafeAreaView style={[globalStyles.container, { flex: 1 }]}>
+        <View style={[globalStyles.content, { flex: 1, justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={[globalStyles.header, { color: '#d32f2f', fontSize: 18 }]}>
+            Error: {error}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[globalStyles.container, { flex: 1 }]}>
@@ -54,23 +71,20 @@ export default function HomeScreen() {
             </Text>
             <View style={globalStyles.statsContainer}>
               <View style={globalStyles.statCard}>
+                <Ionicons name="briefcase-outline" size={20} color="#3B82F6" style={{ marginBottom: 4 }} />
                 <Text style={globalStyles.statNumber}>{applications.length}</Text>
                 <Text style={globalStyles.statLabel}>Total Applications</Text>
               </View>
               <View style={globalStyles.statCard}>
-                <Text style={globalStyles.statNumber}>
+                <Ionicons name="close-circle-outline" size={20} color={STATUS_COLORS['Rejected']} style={{ marginBottom: 4 }} />
+                <Text style={[globalStyles.statNumber, { color: STATUS_COLORS['Rejected'] }]}>
                   {applications.filter((app: JobApplication) => app.status === 'Rejected').length}
                 </Text>
                 <Text style={globalStyles.statLabel}>Rejected</Text>
               </View>
               <View style={globalStyles.statCard}>
-                <Text style={globalStyles.statNumber}>
-                  {applications.filter((app: JobApplication) => app.status === 'Interviewed').length}
-                </Text>
-                <Text style={globalStyles.statLabel}>Interviewed</Text>
-              </View>
-              <View style={globalStyles.statCard}>
-                <Text style={globalStyles.statNumber}>
+                <Ionicons name="checkmark-circle-outline" size={20} color={STATUS_COLORS['Accepted']} style={{ marginBottom: 4 }} />
+                <Text style={[globalStyles.statNumber, { color: STATUS_COLORS['Accepted'] }]}>
                   {applications.filter((app: JobApplication) => app.status === 'Accepted').length}
                 </Text>
                 <Text style={globalStyles.statLabel}>Accepted</Text>
@@ -81,30 +95,36 @@ export default function HomeScreen() {
 
         {hasApplications ? (
           <View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <Text style={[globalStyles.header, { fontSize: 20 }]}>
-                Recent Applications
-              </Text>
-              <Button
-                title="View All"
-                onPress={() => router.push('/history')}
-                variant="secondary"
-                disabled={false}
-                style={{ paddingHorizontal: 16, paddingVertical: 8 }}
-              />
-            </View>
-            {recentApplications.map((job: JobApplication) => (
-              <JobCard
-                key={job.id}
-                job={job}
-                onStatusUpdate={updateStatus}
-                onDelete={deleteJob}
-              />
-            ))}
+            <FlatList
+              data={recentApplications}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <JobCard
+                  job={item}
+                  onStatusUpdate={updateStatus}
+                  onDelete={deleteJob}
+                />
+              )}
+              scrollEnabled={false}
+              ListHeaderComponent={
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <Text style={[globalStyles.header, { fontSize: 20 }]}>
+                    Recent Applications
+                  </Text>
+                  <Button
+                    title="View All"
+                    onPress={() => router.push('/history')}
+                    variant="secondary"
+                    disabled={false}
+                    style={{ marginTop: 8 }}
+                  />
+                </View>
+              }
+            />
           </View>
         ) : (
-          <View style={globalStyles.emptyState}>
-            <Ionicons name="document-text-outline" size={64} color="#9CA3AF" />
+          <Animated.View style={[globalStyles.emptyState, { opacity: fadeAnim }]}>
+            <Ionicons name="document-text-outline" size={80} color="#9CA3AF" />
             <Text style={globalStyles.emptyStateText}>No Applications Yet</Text>
             <Text style={globalStyles.emptyStateSubtext}>
               Start by adding your first job application to track your progress.
@@ -114,7 +134,7 @@ export default function HomeScreen() {
               onPress={() => router.push('/AddJobScreen')}
               disabled={false}
             />
-          </View>
+          </Animated.View>
         )}
 
         <View style={globalStyles.card}>

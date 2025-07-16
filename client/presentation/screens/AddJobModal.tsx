@@ -13,30 +13,29 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Button, Input } from 'react-native-elements';
-
-
+import { Button, Input } from 'react-native-elements'
 export default function AddJobModal() {
   const { formData, setFormData, errors, loading, handleSubmit, showInterviewFields } =
     useAddJobViewModel();
 
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showInterviewDatePicker, setShowInterviewDatePicker] = useState(false);
+  const [datePickerMode, setDatePickerMode] = useState<'dateApplied' | 'interviewDate' | null>(null);
 
-  const onChangeDateApplied = (event: any, selectedDate: Date | undefined) => {
-    setShowDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setFormData((prev: AddJobFormData) => ({ ...prev, dateApplied: selectedDate }));
-    }
+  const openDatePicker = (mode: 'dateApplied' | 'interviewDate') => {
+    setDatePickerMode(mode);
   };
 
-  const onChangeInterviewDate = (event: any, selectedDate: Date | undefined) => {
-    setShowInterviewDatePicker(Platform.OS === 'ios');
+  const onChangeDate = (event: any, selectedDate: Date | undefined) => {
+    if (Platform.OS !== 'ios') {
+      setDatePickerMode(null);
+    }
     if (selectedDate) {
-      setFormData((prev: AddJobFormData) => ({ ...prev, interviewDate: selectedDate }));
+      if (datePickerMode === 'dateApplied') {
+        setFormData((prev: AddJobFormData) => ({ ...prev, dateApplied: selectedDate }));
+      } else if (datePickerMode === 'interviewDate') {
+        setFormData((prev: AddJobFormData) => ({ ...prev, interviewDate: selectedDate }));
+      }
     }
   };
-
 
   return (
     <KeyboardAvoidingView
@@ -67,28 +66,27 @@ export default function AddJobModal() {
         />
 
         {/* Date Applied */}
-        <Text style={styles.pickerLabel}>Date Applied:</Text>
-        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePickerButton}>
-          <Text style={styles.datePickerButtonText}>
-            {formData.dateApplied ? formData.dateApplied.toLocaleDateString() : 'Select Date'}
-          </Text>
+        <TouchableOpacity onPress={() => openDatePicker('dateApplied')}>
+          <View pointerEvents="none">
+            <Input
+              label="Date Applied"
+              value={formData.dateApplied ? formData.dateApplied.toLocaleDateString() : ''}
+              placeholder="Select Date"
+              editable={false}
+              rightIcon={{ type: 'font-awesome', name: 'calendar', color: '#86939e' }}
+              errorMessage={errors.dateApplied}
+              containerStyle={styles.inputContainer}
+            />
+          </View>
         </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={formData.dateApplied || new Date()}
-            mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={onChangeDateApplied}
-          />
-        )}
-        {errors.dateApplied && <Text style={styles.errorText}>{errors.dateApplied}</Text>}
-
 
         <Text style={styles.pickerLabel}>Initial Status:</Text>
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={formData.initialStatus}
-            onValueChange={(itemValue: JobStatus) => setFormData((prev: AddJobFormData) => ({ ...prev, initialStatus: itemValue }))}
+            onValueChange={(itemValue: JobStatus) =>
+              setFormData((prev: AddJobFormData) => ({ ...prev, initialStatus: itemValue }))
+            }
             style={styles.picker}
           >
             {STATUS_OPTIONS.map((statusOption) => (
@@ -98,14 +96,17 @@ export default function AddJobModal() {
         </View>
         {errors.initialStatus && <Text style={styles.errorText}>{errors.initialStatus}</Text>}
 
-        {/* Interview Details Section (Conditionally Rendered) */}
+        {/* Interview Details Section */}
         {showInterviewFields && (
           <View style={styles.interviewSection}>
             <Text style={styles.sectionTitle}>Interview Details</Text>
+
             <Input
               label="Interview Type"
               value={formData.interviewType}
-              onChangeText={(text) => setFormData((prev: AddJobFormData) => ({ ...prev, interviewType: text }))}
+              onChangeText={(text) =>
+                setFormData((prev: AddJobFormData) => ({ ...prev, interviewType: text }))
+              }
               placeholder="e.g., Technical, HR, On-site"
               containerStyle={styles.inputContainer}
             />
@@ -113,30 +114,28 @@ export default function AddJobModal() {
             <Input
               label="Interview Round"
               value={formData.interviewRound}
-              onChangeText={(text) => setFormData((prev: AddJobFormData) => ({ ...prev, interviewRound: text }))}
+              onChangeText={(text) =>
+                setFormData((prev: AddJobFormData) => ({ ...prev, interviewRound: text }))
+              }
               placeholder="e.g., 1st, Final"
               containerStyle={styles.inputContainer}
             />
 
-            {/* Interview Date Picker */}
-            <Text style={styles.pickerLabel}>Interview Date:</Text>
-            <TouchableOpacity onPress={() => setShowInterviewDatePicker(true)} style={styles.datePickerButton}>
-              <Text style={styles.datePickerButtonText}>
-                {formData.interviewDate ? formData.interviewDate.toLocaleDateString() : 'Select Date'}
-              </Text>
+            <TouchableOpacity onPress={() => openDatePicker('interviewDate')}>
+              <View pointerEvents="none">
+                <Input
+                  label="Interview Date"
+                  value={formData.interviewDate ? formData.interviewDate.toLocaleDateString() : ''}
+                  placeholder="Select Date"
+                  editable={false}
+                  rightIcon={{ type: 'font-awesome', name: 'calendar', color: '#86939e' }}
+                  errorMessage={errors.interviewDate}
+                  containerStyle={styles.inputContainer}
+                />
+              </View>
             </TouchableOpacity>
-            {showInterviewDatePicker && (
-              <DateTimePicker
-                value={formData.interviewDate || new Date()}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={onChangeInterviewDate}
-              />
-            )}
-            {errors.interviewDate && <Text style={styles.errorText}>{errors.interviewDate}</Text>}
           </View>
         )}
-
 
         <Input
           label="Notes (Optional)"
@@ -157,6 +156,19 @@ export default function AddJobModal() {
           disabled={loading}
           containerStyle={styles.addButtonContainer}
         />
+
+        {datePickerMode && (
+          <DateTimePicker
+            value={
+              datePickerMode === 'dateApplied'
+                ? formData.dateApplied || new Date()
+                : formData.interviewDate || new Date()
+            }
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onChangeDate}
+          />
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -226,22 +238,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
     paddingBottom: 10,
   },
-  datePickerButton: {
-    height: 48,
-    borderColor: '#bdc6cf',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 10,
-    justifyContent: 'center',
-    marginBottom: 16,
-    backgroundColor: '#F9FAFB',
-  },
-  datePickerButtonText: {
-    fontSize: 16,
-    color: '#86939e',
-  },
   addButtonContainer: {
     marginTop: 24,
     marginBottom: Platform.OS === 'ios' ? 0 : 20,
-  }
+  },
 });

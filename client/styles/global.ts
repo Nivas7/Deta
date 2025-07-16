@@ -3,6 +3,11 @@ import { Dimensions, StyleSheet } from 'react-native';
 const { width: screenWidth } = Dimensions.get('window');
 
 export const globalStyles = StyleSheet.create({
+  title: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 24,
+    color: '#000',
+  },
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
@@ -12,7 +17,7 @@ export const globalStyles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   content: {
-    flexGrow: 1, // ✅ so children can expand to enable scrolling
+    flexGrow: 1,
     padding: 20,
   },
   header: {
@@ -97,7 +102,7 @@ export const globalStyles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
-    marginBottom: 0, // Reset if set previously for multiline
-    height: 50, // Standard height for single-line input
+    marginBottom: 0,
+    height: 50,
   }
 });
