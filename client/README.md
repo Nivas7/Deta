@@ -1,8 +1,6 @@
 > [!NOTE]
 > Still in Beta Version
 
-![](https://komarev.com/ghpvc/?username=nivas7)
-[![analytics](http://www.google-analytics.com/collect?v=1&t=pageview&_s=1&dl=https%3A%2F%2Fgithub.com%2Fnivaz7%2FDeta%2Fapp-password&_u=MAC~&cid=1757014354.1393964045&tid=UA-XTZ530-2)]()
 # Welcome Deta 👋
 
 **Deta, a React Native application designed for comprehensive job application tracking and analytics.**
