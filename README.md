@@ -18,4 +18,4 @@
 
 ## Access & Feedback
 
-If you are interested in using the **v1** version [v1 - apk Download](https://expo.dev/accounts/nivaz7/projects/client/builds/c6b82e5e-af8d-4699-b5f1-7c24905d4bfc) or want to provide feedback, please [email us](mailto:sri112168@gmail.com?subject=Deta%20Beta%20Access%20Request) with your  suggestions.
+If you are interested in using the **v1** version [v1 - apk Download](https://github.com/nivas7/deta/bin) or want to provide feedback, please [email us](mailto:sri112168@gmail.com?subject=Deta%20Beta%20Access%20Request) with your  suggestions.
