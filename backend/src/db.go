@@ -32,9 +32,3 @@ func checkDBConnection() bool {
 	log.Println("Database connection is active")
 	return true
 }
-
-func getUsers() ([]User, error) {
-	var users []User
-	err := DB.Find(&users).Error
-	return users, err
-}
